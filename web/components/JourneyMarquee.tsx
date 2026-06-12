@@ -17,14 +17,18 @@ import {
  */
 const ROW1 = [
   { src: "/journey/j01-new-start.jpg", alt: "新的起点" },
+  { src: "/journey/j02-qidian-studio.jpg", alt: "起点工作室" },
+  { src: "/journey/j14-first-tetris.jpg", alt: "第一个完整项目 · C++ 俄罗斯方块" },
   { src: "/journey/j03-project-sketch.jpg", alt: "项目草图" },
   { src: "/journey/j05-icpc-16.jpg", alt: "第 16 届 ICPC" },
   { src: "/journey/j06-icpc-17.jpg", alt: "第 17 届 ICPC" },
 ];
 
 const ROW2 = [
-  { src: "/journey/j02-qidian-studio.jpg", alt: "起点工作室" },
+  { src: "/journey/j13-lab.jpg", alt: "机房" },
   { src: "/journey/j04-workbench.jpg", alt: "工作台" },
+  { src: "/journey/j11-team-photo.jpg", alt: "团队合照" },
+  { src: "/journey/j12-team-dinner.jpg", alt: "团队聚餐" },
   { src: "/journey/j07-ict-cert.jpg", alt: "ICT 证书" },
   { src: "/journey/j08-national-first.jpg", alt: "程序设计大赛国一" },
   { src: "/journey/j09-bronze.jpg", alt: "ICPC 铜奖" },

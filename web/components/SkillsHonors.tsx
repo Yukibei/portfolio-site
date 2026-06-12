@@ -9,12 +9,16 @@ const SKILLS = [
 ];
 
 const HONORS = [
+  { name: "全国高校计算机能力挑战赛", level: "国家级一等奖", national: true },
   { name: "中国大学生服务外包创新创业大赛", level: "国家级三等奖", national: true },
-  { name: "中国大学生计算机设计大赛", level: "国家级三等奖", national: true },
   { name: "华为 ICT 大赛实践赛云赛道", level: "全国三等奖", national: true },
   { name: "蓝桥杯大赛程序设计", level: "省二等奖", national: false },
   { name: "ICPC 程序设计竞赛省赛", level: "解题数达铜奖线", national: false },
-  { name: "软考", level: "软件设计师（中级）", national: false },
+  {
+    name: "全国计算机技术与软件专业技术资格考试",
+    level: "软件设计师（中级）",
+    national: false,
+  },
 ];
 
 export default function SkillsHonors() {

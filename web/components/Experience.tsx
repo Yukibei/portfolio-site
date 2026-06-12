@@ -89,7 +89,7 @@ export default function Experience() {
     >
       <SectionTitle index="03" en="Experience." zh="实习经历" />
 
-      <div className="space-y-0 border-t border-white/10 lg:max-w-[62%]">
+      <div className="space-y-0 border-t border-white/10 lg:max-w-[66%]">
         {EXPERIENCES.map((exp, i) => {
           const open = openIdx === i;
           return (
@@ -105,7 +105,7 @@ export default function Experience() {
                     setOpenIdx(open ? null : i);
                   }
                 }}
-                className="group cursor-pointer border-b border-white/10 py-10 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.04]"
+                className="group cursor-pointer border-b border-white/10 py-10 outline-none"
               >
                 <div className="grid gap-4 lg:grid-cols-[220px_1fr] lg:gap-12">
                   <div className="font-inter text-sm tracking-widest text-white/40">

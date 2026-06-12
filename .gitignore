@@ -1,0 +1,13 @@
+/.omx/
+/.playwright-mcp/
+/logs/
+/*.png
+
+web/node_modules/
+web/.next/
+web/out/
+web/build/
+web/.vercel/
+web/.env*
+web/*.tsbuildinfo
+web/next-env.d.ts

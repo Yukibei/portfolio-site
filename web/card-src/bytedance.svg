@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 110">
+  <!-- 符号：ByteDance 官方律动符号路径（Simple Icons 官方收录），官方蓝 #3C8CFF -->
+  <g transform="translate(2 11) scale(3.67)">
+    <path fill="#3C8CFF" d="M19.8772 1.4685L24 2.5326v18.9426l-4.1228 1.0563V1.4685zm-13.3481 9.428l4.115 1.0641v8.9786l-4.115 1.0642v-11.107zM0 2.572l4.115 1.0642v16.7354L0 21.428V2.572zm17.4553 5.6205v11.107l-4.1228-1.0642V9.2568l4.1228-1.0642z"/>
+  </g>
+  <!-- 字标：系统粗黑体排版（Chrome 渲染锐利，不依赖手绘字形） -->
+  <text x="116" y="62" fill="#1d1d1f" font-family="Arial Black, Arial, sans-serif" font-size="46" font-weight="900" letter-spacing="-1">ByteDance</text>
+  <text x="120" y="98" fill="#666" font-family="Microsoft YaHei, PingFang SC, sans-serif" font-size="23" font-weight="700" letter-spacing="9">字节跳动</text>
+</svg>

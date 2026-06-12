@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  /* 1678x2532 = 卡正面 UV 区域(839x1266)的 2 倍，atlas 合成 scale=2 后 1:1 像素映射，零缩放零裁剪 */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1678px; height: 2532px; }
+  body {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background:
+      linear-gradient(135deg, rgba(0,166,255,0.08), transparent 26%),
+      linear-gradient(315deg, rgba(255,59,92,0.07), transparent 26%),
+      #fff;
+    color: #101010;
+    font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+  }
+  body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(to right, rgba(0,0,0,0.035) 0 1px, transparent 1px 108px),
+      repeating-linear-gradient(to bottom, rgba(0,0,0,0.035) 0 1px, transparent 1px 108px);
+    pointer-events: none;
+  }
+  .accent {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 440px;
+    height: 280px;
+    background: linear-gradient(135deg, #00a6ff 0 49%, #111 49% 55%, #ff3b5c 55%);
+    clip-path: polygon(24% 0, 100% 0, 100% 100%, 0 0);
+  }
+  .top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 88px 112px 0;
+  }
+  .brand img { width: 640px; height: auto; display: block; }
+  .badge-title {
+    position: absolute;
+    top: 76px;
+    right: 48px;
+    z-index: 1;
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    color: #fff;
+  }
+  .slot {
+    position: absolute;
+    top: 196px;
+    left: 50%;
+    z-index: 2;
+    width: 178px;
+    height: 48px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: #111;
+    box-shadow: inset 0 0 0 10px rgba(255,255,255,0.14);
+  }
+  .slot::after {
+    content: "";
+    position: absolute;
+    inset: 13px 36px;
+    border-radius: 999px;
+    background: #fff;
+  }
+  .photo-shell {
+    position: relative;
+    z-index: 1;
+    /* 内框 880x1140 与照片 612x792 同比例(0.773)，cover 零裁剪 */
+    width: 952px;
+    height: 1212px;
+    margin: 182px auto 0;
+    padding: 28px;
+    border: 8px solid #111;
+    background: #fff;
+    box-shadow: 38px 38px 0 rgba(0, 166, 255, 0.12), -38px -38px 0 rgba(255, 59, 92, 0.1);
+  }
+  .photo-shell::before,
+  .photo-shell::after {
+    content: "";
+    position: absolute;
+    width: 170px;
+    height: 20px;
+    background: #111;
+  }
+  .photo-shell::before { top: -14px; left: 70px; }
+  .photo-shell::after { bottom: -14px; right: 70px; }
+  .photo {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #f6f7f9;
+  }
+  .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+  .identity {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    margin-top: 64px;
+  }
+  .identity .cn {
+    font-size: 172px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 40px;
+    text-indent: 40px;
+  }
+  .identity .en {
+    margin-top: 30px;
+    font-family: "Arial Black", Arial, sans-serif;
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: 26px;
+  }
+  .role {
+    display: inline-flex;
+    align-items: center;
+    gap: 26px;
+    margin-top: 44px;
+    padding: 22px 40px;
+    background: #111;
+    color: #fff;
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: 7px;
+  }
+  .role i { width: 28px; height: 28px; background: #00a6ff; display: block; }
+  .role i:last-child { background: #ff3b5c; }
+  .info {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px 96px;
+    margin: 74px 112px 0;
+    padding-top: 42px;
+    padding-bottom: 78px;
+    border-top: 6px solid #111;
+  }
+  .item {
+    min-height: 112px;
+    text-align: center;
+  }
+  .item .k {
+    color: #777;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 7px;
+    line-height: 1.2;
+  }
+  .item .v {
+    margin-top: 18px;
+    font-size: 44px;
+    line-height: 1.05;
+    font-weight: 900;
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+  .bottom {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    height: 134px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 112px;
+    background: #111;
+    color: #fff;
+  }
+  .bottom .code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: 4px;
+  }
+  .bottom .access {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 10px;
+  }
+</style>
+</head>
+<body>
+  <div class="accent"></div>
+  <div class="slot"></div>
+  <div class="top">
+    <div class="brand"><img src="bytedance.svg" alt="ByteDance"></div>
+    <div class="badge-title">员工工作证</div>
+  </div>
+
+  <div class="photo-shell">
+    <div class="photo"><img src="photo.png" alt="李怡霖证件照"></div>
+  </div>
+
+  <section class="identity">
+    <div class="cn">李怡霖</div>
+    <div class="en">YILING LI</div>
+    <div class="role"><i></i>AI 应用开发实习生<i></i></div>
+  </section>
+
+  <section class="info">
+    <div class="item"><div class="k">部门 DEPT.</div><div class="v">AI PLATFORM</div></div>
+    <div class="item"><div class="k">工号 ID NO.</div><div class="v">BD-2026-0916</div></div>
+    <div class="item"><div class="k">办公地点 BASE</div><div class="v">BEIJING</div></div>
+    <div class="item"><div class="k">有效期 VALID</div><div class="v">2026.06-27.06</div></div>
+  </section>
+
+  <footer class="bottom">
+    <div class="code">BD&lt;&lt;YILING&lt;&lt;AI&lt;&lt;2026</div>
+    <div class="access">ACCESS 01</div>
+  </footer>
+</body>
+</html>

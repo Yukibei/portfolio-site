@@ -12,29 +12,33 @@ import {
 /**
  * 个人历程照片带 — 双行无限流动
  * 行为：缓速自动流动（两行反向）+ 页面滚动联动加速 + 鼠标/手指可抓住拖拽甩动。
- * 照片清单：public/journey/，真实照片到位后同名替换并按需改下方数组。
+ * 等高混排：行高固定，每张照片按原始比例完整显示（横图宽、竖图窄），不裁切。
+ * 照片在 public/journey/，行内按时间线排序；增删照片改下方数组即可。
  */
-const JOURNEY = [
-  { src: "/journey/01.png", year: "2022", zh: "入学", en: "ENROLLMENT" },
-  { src: "/journey/02.png", year: "2022", zh: "起点工作室", en: "QIDIAN STUDIO" },
-  { src: "/journey/03.png", year: "2023", zh: "第一个完整项目", en: "FIRST PROJECT" },
-  { src: "/journey/04.png", year: "2023", zh: "深夜代码", en: "LATE NIGHT BUILD" },
-  { src: "/journey/05.png", year: "2024", zh: "ICPC 区域赛", en: "ICPC REGIONAL" },
-  { src: "/journey/06.png", year: "2024", zh: "国家级奖项", en: "NATIONAL AWARD" },
-  { src: "/journey/07.png", year: "2025", zh: "讯飞实习", en: "IFLYTEK INTERN" },
-  { src: "/journey/08.png", year: "2025", zh: "交控科技", en: "TCT PROJECT" },
-  { src: "/journey/09.png", year: "2026", zh: "Hoop Pupil 上线", en: "SHIP IT" },
-  { src: "/journey/10.png", year: "2026", zh: "下一站", en: "NEXT CHAPTER" },
+const ROW1 = [
+  { src: "/journey/j01-new-start.jpg", alt: "新的起点" },
+  { src: "/journey/j03-project-sketch.jpg", alt: "项目草图" },
+  { src: "/journey/j05-icpc-16.jpg", alt: "第 16 届 ICPC" },
+  { src: "/journey/j06-icpc-17.jpg", alt: "第 17 届 ICPC" },
 ];
 
-const ROW1 = JOURNEY.slice(0, 5);
-const ROW2 = JOURNEY.slice(5);
+const ROW2 = [
+  { src: "/journey/j02-qidian-studio.jpg", alt: "起点工作室" },
+  { src: "/journey/j04-workbench.jpg", alt: "工作台" },
+  { src: "/journey/j07-ict-cert.jpg", alt: "ICT 证书" },
+  { src: "/journey/j08-national-first.jpg", alt: "程序设计大赛国一" },
+  { src: "/journey/j09-bronze.jpg", alt: "ICPC 铜奖" },
+  { src: "/journey/j10-iflytek.jpg", alt: "讯飞实习" },
+];
+
+// 渲染份数：保证 track 总宽 ≥ 视口 + 单份宽，超宽屏循环也无缝
+const COPIES = 3;
 
 function MarqueeRow({
   items,
   direction,
 }: {
-  items: typeof JOURNEY;
+  items: { src: string; alt: string }[];
   direction: 1 | -1;
 }) {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -46,7 +50,7 @@ function MarqueeRow({
     if (!$viewport || !$track) return;
 
     // speed 单位 px/s，按帧间隔补偿，掉帧/节流时流速恒定
-    const state = { speed: 30 * direction, width: $track.scrollWidth / 2 };
+    const state = { speed: 30 * direction, width: $track.scrollWidth / COPIES };
 
     const animatable = createAnimatable($track, {
       x: 0,
@@ -72,7 +76,7 @@ function MarqueeRow({
       x(x() - dy * 0.55 * direction);
     };
     const onResize = () => {
-      state.width = $track.scrollWidth / 2;
+      state.width = $track.scrollWidth / COPIES;
     };
 
     const timer = createTimer({
@@ -94,36 +98,27 @@ function MarqueeRow({
     };
   }, [direction]);
 
+  const copies = Array.from({ length: COPIES }, () => items).flat();
+
   return (
     <div
       ref={viewportRef}
       className="cursor-grab touch-pan-y select-none overflow-hidden active:cursor-grabbing"
     >
       <div ref={trackRef} className="flex w-max gap-3 will-change-transform">
-        {[...items, ...items].map((it, i) => (
+        {copies.map((it, i) => (
           <figure
             key={i}
-            className="relative h-[180px] w-[280px] shrink-0 overflow-hidden rounded-2xl border border-white/10 sm:h-[218px] sm:w-[340px] lg:h-[270px] lg:w-[420px]"
+            className="h-[180px] shrink-0 overflow-hidden rounded-2xl border border-white/10 sm:h-[218px] lg:h-[270px]"
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- 流动带内大量小图，免 next/image 包装开销 */}
             <img
               src={it.src}
-              alt={`${it.year} ${it.zh}`}
-              className="h-full w-full object-cover"
+              alt={it.alt}
+              className="h-full w-auto object-cover"
               draggable={false}
               loading="lazy"
             />
-            <figcaption className="absolute inset-x-0 bottom-0 flex items-baseline gap-2.5 bg-gradient-to-t from-black/75 to-transparent px-4 pb-2.5 pt-9">
-              <span className="font-inter text-[10px] tracking-[0.25em] text-white/55">
-                {it.year}
-              </span>
-              <span className="font-inter text-xs font-semibold tracking-wider text-white/90">
-                {it.zh}
-              </span>
-              <span className="ml-auto font-inter text-[9px] uppercase tracking-[0.2em] text-white/35">
-                {it.en}
-              </span>
-            </figcaption>
           </figure>
         ))}
       </div>

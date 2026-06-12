@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { ArrowUpRight, Award, Crown } from "lucide-react";
 import { STATS } from "./constants";
 
-const VIDEO_URL = "/hero-video.mp4?v=2";
+const VIDEO_URL = "/hero-video.mp4?v=3";
 const POSTER_URL = "/hero-poster.jpg";
 
 function BackgroundVideo() {

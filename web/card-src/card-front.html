@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <style>
   /* 1678x2532 = 卡正面 UV 区域(839x1266)的 2 倍，atlas 合成 scale=2 后 1:1 像素映射，零缩放零裁剪 */
+  /* 高度预算：top 223 + photo 96+1380 + identity 448 + info 318 ≈ 2369，footer 吸底，余量 ~29px */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 1678px; height: 2532px; }
   body {
@@ -45,42 +46,13 @@
     padding: 88px 112px 0;
   }
   .brand img { width: 640px; height: auto; display: block; }
-  .badge-title {
-    position: absolute;
-    top: 76px;
-    right: 48px;
-    z-index: 1;
-    font-size: 38px;
-    font-weight: 900;
-    letter-spacing: 8px;
-    color: #fff;
-  }
-  .slot {
-    position: absolute;
-    top: 196px;
-    left: 50%;
-    z-index: 2;
-    width: 178px;
-    height: 48px;
-    transform: translateX(-50%);
-    border-radius: 999px;
-    background: #111;
-    box-shadow: inset 0 0 0 10px rgba(255,255,255,0.14);
-  }
-  .slot::after {
-    content: "";
-    position: absolute;
-    inset: 13px 36px;
-    border-radius: 999px;
-    background: #fff;
-  }
   .photo-shell {
     position: relative;
     z-index: 1;
     /* 内框 880x1140 与照片 612x792 同比例(0.773)，cover 零裁剪 */
     width: 952px;
     height: 1212px;
-    margin: 182px auto 0;
+    margin: 96px auto 0;
     padding: 28px;
     border: 8px solid #111;
     background: #fff;
@@ -113,7 +85,7 @@
     position: relative;
     z-index: 1;
     text-align: center;
-    margin-top: 64px;
+    margin-top: 48px;
   }
   .identity .cn {
     font-size: 172px;
@@ -148,16 +120,12 @@
     z-index: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 50px 96px;
-    margin: 74px 112px 0;
-    padding-top: 42px;
-    padding-bottom: 78px;
+    gap: 40px 96px;
+    margin: 44px 112px 0;
+    padding-top: 32px;
     border-top: 6px solid #111;
   }
-  .item {
-    min-height: 112px;
-    text-align: center;
-  }
+  .item { text-align: center; }
   .item .k {
     color: #777;
     font-size: 28px;
@@ -185,25 +153,34 @@
     background: #111;
     color: #fff;
   }
-  .bottom .code {
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 38px;
-    font-weight: 800;
-    letter-spacing: 4px;
-  }
-  .bottom .access {
-    font-size: 32px;
+  .bottom .badge {
+    display: flex;
+    align-items: baseline;
+    gap: 28px;
+    font-size: 40px;
     font-weight: 900;
     letter-spacing: 10px;
+  }
+  .bottom .badge em {
+    font-style: normal;
+    color: rgba(255,255,255,0.55);
+    font-family: "Arial Black", Arial, sans-serif;
+    font-size: 26px;
+    letter-spacing: 6px;
+  }
+  .bottom .code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.85);
   }
 </style>
 </head>
 <body>
   <div class="accent"></div>
-  <div class="slot"></div>
   <div class="top">
     <div class="brand"><img src="bytedance.svg" alt="ByteDance"></div>
-    <div class="badge-title">员工工作证</div>
   </div>
 
   <div class="photo-shell">
@@ -220,12 +197,12 @@
     <div class="item"><div class="k">部门 DEPT.</div><div class="v">AI PLATFORM</div></div>
     <div class="item"><div class="k">工号 ID NO.</div><div class="v">BD-2026-0916</div></div>
     <div class="item"><div class="k">办公地点 BASE</div><div class="v">BEIJING</div></div>
-    <div class="item"><div class="k">有效期 VALID</div><div class="v">2026.06-27.06</div></div>
+    <div class="item"><div class="k">有效期 VALID</div><div class="v">2026.06 - 2027.06</div></div>
   </section>
 
   <footer class="bottom">
-    <div class="code">BD&lt;&lt;YILING&lt;&lt;AI&lt;&lt;2026</div>
-    <div class="access">ACCESS 01</div>
+    <div class="badge">员工工作证<em>EMPLOYEE BADGE</em></div>
+    <div class="code">BD&lt;&lt;2026</div>
   </footer>
 </body>
 </html>

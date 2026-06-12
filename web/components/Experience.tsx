@@ -1,12 +1,16 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useRef } from "react";
+import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import Reveal, { SectionTitle } from "./Reveal";
 
-// three.js 体积大且依赖浏览器 API，懒加载 + 关 SSR
-const Lanyard = dynamic(() => import("./Lanyard"), { ssr: false });
+const preloadLanyard = () => import("./Lanyard");
+const Lanyard = dynamic(preloadLanyard, {
+  ssr: false,
+  loading: () => <BadgeFallback />,
+});
 
 const EXPERIENCES = [
   {
@@ -35,6 +39,36 @@ export default function Experience() {
   const sectionRef = useRef<HTMLElement>(null);
   // 滚到实习经历区时工卡从顶部掉落；离开后卸载，下次进入重新掉落
   const inView = useInView(sectionRef, { amount: 0.25 });
+
+  useEffect(() => {
+    const preload = () => {
+      void preloadLanyard();
+      ["/lanyard/card.glb", "/lanyard/front.png", "/lanyard/back.png"].forEach(
+        (href) => {
+          const link = document.createElement("link");
+          link.rel = "prefetch";
+          link.as = href.endsWith(".glb") ? "fetch" : "image";
+          link.href = href;
+          if (href.endsWith(".glb")) link.crossOrigin = "anonymous";
+          document.head.appendChild(link);
+        }
+      );
+    };
+    const win = window as Window &
+      typeof globalThis & {
+        requestIdleCallback?: (
+          callback: IdleRequestCallback,
+          options?: IdleRequestOptions
+        ) => number;
+        cancelIdleCallback?: (handle: number) => void;
+      };
+    if (win.requestIdleCallback && win.cancelIdleCallback) {
+      const id = win.requestIdleCallback(preload, { timeout: 2500 });
+      return () => win.cancelIdleCallback?.(id);
+    }
+    const id = globalThis.setTimeout(preload, 1200);
+    return () => globalThis.clearTimeout(id);
+  }, []);
 
   return (
     <section
@@ -109,5 +143,20 @@ export default function Experience() {
         )}
       </AnimatePresence>
     </section>
+  );
+}
+
+function BadgeFallback() {
+  return (
+    <div className="flex h-full w-full items-start justify-center pt-24">
+      <Image
+        src="/lanyard/front.png"
+        alt=""
+        width={280}
+        height={422}
+        priority={false}
+        className="w-[280px] rounded-[22px] opacity-95 shadow-2xl"
+      />
+    </div>
   );
 }

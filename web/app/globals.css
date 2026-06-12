@@ -1,9 +1,7 @@
-@import url("https://db.onlinewebfonts.com/c/8b75d9dcff6a48c35a46656192adf019?family=FSP+DEMO+-+PODIUM+Sharp+4.11");
 @import "tailwindcss";
 
 @theme {
-  --font-podium: "FSP DEMO - PODIUM Sharp 4.11", "Arial Black", Impact,
-    sans-serif;
+  --font-podium: "Arial Black", Impact, var(--font-sans-inter), sans-serif;
   --font-inter: var(--font-sans-inter), "PingFang SC", "Microsoft YaHei",
     "Noto Sans SC", system-ui, -apple-system, sans-serif;
 }

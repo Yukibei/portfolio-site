@@ -5,6 +5,7 @@ import { ArrowUpRight, Award, Crown } from "lucide-react";
 import { STATS } from "./constants";
 
 const VIDEO_URL = "/hero-video.mp4?v=2";
+const POSTER_URL = "/hero-poster.jpg";
 
 function BackgroundVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -59,7 +60,8 @@ function BackgroundVideo() {
       src={VIDEO_URL}
       muted
       playsInline
-      preload="auto"
+      preload="metadata"
+      poster={POSTER_URL}
       className="absolute inset-0 h-full w-full object-cover"
       style={{ objectPosition: "70% center" }}
     />

@@ -1,7 +1,17 @@
+"use client";
+
+import { useRef } from "react";
 import { ArrowUpRight, Clock } from "lucide-react";
-import Reveal, { SectionTitle } from "./Reveal";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
+import { SectionTitle } from "./Reveal";
 
 // href 为 null 表示部署入口预留：服务器购置后填入正式地址即可
+// images 为项目截图（public/projects/），当前为占位图，真实截图/录屏帧到位后同名替换
 const PROJECTS = [
   {
     no: "01",
@@ -12,6 +22,11 @@ const PROJECTS = [
     stack: "Vue 3 · Spring Boot · FastAPI · PyTorch · MySQL · Redis",
     href: "https://admin.hooppupil.me",
     linkLabel: "Live Demo",
+    images: {
+      a: "/projects/hp-a.png",
+      b: "/projects/hp-b.png",
+      tall: "/projects/hp-tall.png",
+    },
   },
   {
     no: "02",
@@ -22,6 +37,11 @@ const PROJECTS = [
     stack: "Python · LangGraph · LiteLLM · Qdrant · Neo4j · PostgreSQL",
     href: null,
     linkLabel: "Coming Soon",
+    images: {
+      a: "/projects/rl-a.png",
+      b: "/projects/rl-b.png",
+      tall: "/projects/rl-tall.png",
+    },
   },
   {
     no: "03",
@@ -32,84 +52,132 @@ const PROJECTS = [
     stack: "TypeScript · uni-app · Agent Runner · 风险分级",
     href: null,
     linkLabel: "Coming Soon",
+    images: {
+      a: "/projects/oc-a.png",
+      b: "/projects/oc-b.png",
+      tall: "/projects/oc-tall.png",
+    },
   },
 ];
 
-const rowClass =
-  "group grid gap-4 border-b border-white/10 py-8 transition-colors duration-300 sm:py-10 lg:grid-cols-[auto_1.2fr_1fr_auto] lg:items-center lg:gap-10";
+type Project = (typeof PROJECTS)[number];
 
-function RowBody({ p, live }: { p: (typeof PROJECTS)[number]; live: boolean }) {
+function StackCard({
+  p,
+  index,
+  total,
+  progress,
+}: {
+  p: Project;
+  index: number;
+  total: number;
+  progress: MotionValue<number>;
+}) {
+  // 滚动越过本卡后逐渐缩小，被下一张盖住时形成层叠收纳感
+  const targetScale = 1 - (total - 1 - index) * 0.05;
+  const scale = useTransform(progress, [index / total, 1], [1, targetScale]);
+
   return (
-    <>
-      <span className="font-inter text-sm tracking-widest text-white/30 transition-colors group-hover:text-black/40 lg:px-2">
-        ({p.no})
-      </span>
+    <div className="sticky top-0 flex h-screen items-center justify-center">
+      <motion.article
+        style={{ scale, top: `calc(-4vh + ${index * 26}px)` }}
+        className="relative flex max-h-[82vh] w-full max-w-5xl origin-top flex-col gap-5 overflow-hidden rounded-[28px] border border-white/15 bg-[#101010] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.6)] sm:gap-6 sm:rounded-[36px] sm:p-7 lg:rounded-[44px] lg:p-9"
+      >
+        <header className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex items-baseline gap-4 sm:gap-6">
+            <span className="font-inter text-sm tracking-widest text-white/30">
+              ({p.no})
+            </span>
+            <div>
+              <h3 className="font-podium text-3xl uppercase tracking-tight text-white sm:text-4xl lg:text-5xl">
+                {p.name}
+              </h3>
+              <span className="mt-1 block font-inter text-xs tracking-[0.35em] text-white/40">
+                {p.zh}
+              </span>
+            </div>
+          </div>
 
-      <div>
-        <h3 className="font-podium text-3xl uppercase tracking-tight text-white transition-colors group-hover:text-black sm:text-4xl lg:text-5xl">
-          {p.name}
-          <span className="ml-3 align-middle font-inter text-sm font-normal tracking-[0.35em] text-white/40 transition-colors group-hover:text-black/50">
-            {p.zh}
-          </span>
-        </h3>
-        <p className="mt-3 max-w-xl font-inter text-sm leading-relaxed text-white/60 transition-colors group-hover:text-black/70 sm:text-base">
-          {p.desc}
-        </p>
-      </div>
+          {p.href ? (
+            <a
+              href={p.href}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center gap-2 rounded-full border border-white/30 px-5 py-2.5 font-inter text-[11px] uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-black sm:px-6 sm:py-3"
+            >
+              {p.linkLabel}
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
+          ) : (
+            <span className="flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 font-inter text-[11px] uppercase tracking-widest text-white/40 sm:px-6 sm:py-3">
+              <Clock className="h-3.5 w-3.5" />
+              {p.linkLabel}
+            </span>
+          )}
+        </header>
 
-      <div className="font-inter text-xs leading-relaxed tracking-wider text-white/40 transition-colors group-hover:text-black/50 sm:text-sm">
-        <div className="text-white/70 transition-colors group-hover:text-black">
-          {p.metrics}
+        <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2">
+          <p className="max-w-xl font-inter text-sm leading-relaxed text-white/70 sm:text-base">
+            {p.desc}
+          </p>
+          <div className="font-inter text-xs leading-relaxed tracking-wider text-white/40">
+            <div className="text-white/65">{p.metrics}</div>
+            <div className="mt-1">{p.stack}</div>
+          </div>
         </div>
-        <div className="mt-2">{p.stack}</div>
-      </div>
 
-      {live ? (
-        <div className="flex items-center gap-2 font-inter text-[11px] uppercase tracking-widest text-white/70 transition-colors group-hover:text-black lg:justify-self-end lg:px-2">
-          {p.linkLabel}
-          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-[2fr_3fr]">
+          <div className="grid grid-rows-2 gap-3">
+            {/* eslint-disable @next/next/no-img-element -- 卡内多图，占位图阶段保持原生 img */}
+            <img
+              src={p.images.a}
+              alt={`${p.name} 截图 1`}
+              className="h-full min-h-0 w-full rounded-2xl border border-white/10 object-cover sm:rounded-3xl"
+              loading="lazy"
+            />
+            <img
+              src={p.images.b}
+              alt={`${p.name} 截图 2`}
+              className="h-full min-h-0 w-full rounded-2xl border border-white/10 object-cover sm:rounded-3xl"
+              loading="lazy"
+            />
+          </div>
+          <img
+            src={p.images.tall}
+            alt={`${p.name} 主视图`}
+            className="hidden h-full min-h-0 w-full rounded-2xl border border-white/10 object-cover sm:block sm:rounded-3xl"
+            loading="lazy"
+          />
+          {/* eslint-enable @next/next/no-img-element */}
         </div>
-      ) : (
-        <div className="flex flex-col items-start gap-1 lg:items-end lg:justify-self-end lg:px-2">
-          <span className="flex items-center gap-2 font-inter text-[11px] uppercase tracking-widest text-white/40 transition-colors group-hover:text-black/50">
-            <Clock className="h-3.5 w-3.5" />
-            {p.linkLabel}
-          </span>
-          <span className="font-inter text-[10px] tracking-[0.3em] text-white/25 transition-colors group-hover:text-black/40">
-            部署预留
-          </span>
-        </div>
-      )}
-    </>
+      </motion.article>
+    </div>
   );
 }
 
 export default function Projects() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
   return (
     <section
       id="projects"
-      className="scroll-mt-24 px-6 py-20 sm:px-10 lg:px-16 lg:py-28"
+      className="scroll-mt-24 px-6 pt-20 sm:px-10 lg:px-16 lg:pt-28"
     >
       <SectionTitle index="02" en="Selected Works." zh="精选项目" />
 
-      <div className="border-t border-white/10">
+      <div ref={containerRef} className="relative -mt-6">
         {PROJECTS.map((p, i) => (
-          <Reveal key={p.name} delay={i * 0.08}>
-            {p.href ? (
-              <a
-                href={p.href}
-                target="_blank"
-                rel="noreferrer"
-                className={`${rowClass} hover:bg-white`}
-              >
-                <RowBody p={p} live />
-              </a>
-            ) : (
-              <div className={`${rowClass} cursor-default hover:bg-white/90`}>
-                <RowBody p={p} live={false} />
-              </div>
-            )}
-          </Reveal>
+          <StackCard
+            key={p.name}
+            p={p}
+            index={i}
+            total={PROJECTS.length}
+            progress={scrollYProgress}
+          />
         ))}
       </div>
     </section>

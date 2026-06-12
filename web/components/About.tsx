@@ -1,4 +1,5 @@
 import Reveal, { SectionTitle } from "./Reveal";
+import ScrollRevealText from "./ScrollRevealText";
 
 const FACTS = [
   { label: "Class of", value: "2026" },
@@ -24,20 +25,22 @@ export default function About() {
       <SectionTitle index="01" en="Who I Am." zh="关于我" />
 
       <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
-        <Reveal delay={0.1}>
-          <p className="max-w-2xl font-inter text-lg leading-relaxed text-white/80 sm:text-xl lg:text-2xl">
-            我是<span className="font-bold text-white">李怡霖</span>
-            ，2026 届计算机科学与技术本科生。
-            <br />
-            <br />
-            我做的事情很简单：
-            <span className="font-bold text-white">
-              把 AI 能力做成真正可上线的产品
-            </span>
-            —— 从 RAG、多智能体编排，到前后端与部署的完整闭环。
-            <span className="text-white/50">不止于 Demo。</span>
-          </p>
-        </Reveal>
+        <ScrollRevealText
+          className="max-w-2xl font-inter text-lg leading-relaxed text-white sm:text-xl lg:text-2xl"
+          segments={[
+            { text: "我是" },
+            { text: "李怡霖", className: "font-bold" },
+            { text: "，2026 届计算机科学与技术本科生。\n\n我做的事情很简单：" },
+            {
+              text: "把 AI 能力做成真正可上线的产品",
+              className: "font-bold",
+            },
+            {
+              text: " —— 从 RAG、多智能体编排，到前后端与部署的完整闭环。",
+            },
+            { text: "不止于 Demo。", className: "text-white/60" },
+          ]}
+        />
 
         <Reveal delay={0.2}>
           <dl className="grid grid-cols-2 gap-x-8 gap-y-6 border-t border-white/15 pt-8">

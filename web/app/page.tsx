@@ -1,4 +1,5 @@
 import About from "@/components/About";
+import JourneyMarquee from "@/components/JourneyMarquee";
 import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import SkillsHonors from "@/components/SkillsHonors";
@@ -14,6 +15,7 @@ export default function Home() {
 
       {/* 覆盖滚动内容：从 Hero 上方缓缓盖过 */}
       <div className="relative z-10 rounded-t-[2.5rem] bg-black shadow-[0_-24px_80px_rgba(0,0,0,0.55)]">
+        <JourneyMarquee />
         <About />
         <Projects />
         <Experience />

@@ -39,6 +39,7 @@ bash scripts/lint.sh
 
 ```bash
 bash scripts/deploy/build-aliyun-package.sh   # 产出部署包
+bash scripts/deploy/verify-package.sh         # 启动 standalone 并检查核心路由
 ```
 
 服务器目录为 `/opt/portfolio-site`，采用 `releases/<时间戳>` + `current` 软链的

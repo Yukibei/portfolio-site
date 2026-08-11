@@ -5,7 +5,7 @@ import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import NotesShell from "@/components/notes/NotesShell";
-import ReadingTracker from "@/components/notes/glass/ReadingTracker";
+import ReadingTracker from "@/components/notes/glass/storage/ReadingTracker";
 import NoteToc from "@/components/notes/NoteToc";
 import { mdxComponents } from "@/components/notes/mdxComponents";
 import { getAllNotes, getNote } from "@/content/notes";

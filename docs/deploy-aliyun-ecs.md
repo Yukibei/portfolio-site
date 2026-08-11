@@ -10,6 +10,7 @@
 
 ```bash
 bash scripts/deploy/build-aliyun-package.sh
+bash scripts/deploy/verify-package.sh
 ```
 
 产物位置：
@@ -18,62 +19,57 @@ bash scripts/deploy/build-aliyun-package.sh
 .omx/deploy/portfolio-site-aliyun.tar.gz
 ```
 
-## 服务器目录建议
-
-```text
-/opt/portfolio-site/current
-```
-
-## 手动上传与启动示例
-
-把压缩包上传到服务器后执行：
+上传前记录校验值，服务器下载后应得到相同结果：
 
 ```bash
-sudo mkdir -p /opt/portfolio-site/current
-sudo tar -xzf portfolio-site-aliyun.tar.gz -C /opt/portfolio-site/current
-cd /opt/portfolio-site/current
-HOSTNAME=127.0.0.1 PORT=3000 ./start.sh
+sha256sum .omx/deploy/portfolio-site-aliyun.tar.gz
 ```
 
-## systemd 服务示例
+## 服务器目录
 
-```ini
-[Unit]
-Description=Portfolio Site
-After=network.target
-
-[Service]
-Type=simple
-WorkingDirectory=/opt/portfolio-site/current
-Environment=NODE_ENV=production
-Environment=HOSTNAME=127.0.0.1
-Environment=PORT=3000
-ExecStart=/opt/portfolio-site/current/start.sh
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
+```text
+/opt/portfolio-site/releases/<时间戳>
+/opt/portfolio-site/current -> releases/<当前版本>
 ```
 
-## Nginx 反代示例
+## 上传与发布
 
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
+上传部署包和安装脚本：
 
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
-}
+```bash
+scp .omx/deploy/portfolio-site-aliyun.tar.gz root@服务器:/root/
+scp scripts/deploy/install-aliyun-ecs.sh root@服务器:/root/
+```
+
+首次发布和后续更新使用同一条命令：
+
+```bash
+sudo DOMAIN="liyilin.xyz www.liyilin.xyz" \
+  bash /root/install-aliyun-ecs.sh /root/portfolio-site-aliyun.tar.gz
+```
+
+脚本会创建新 release、切换 `current` 软链、重启 systemd，并请求
+`127.0.0.1:3000/` 做健康检查。启动失败时自动切回上一个 release；Nginx
+配置校验失败时恢复原配置。
+
+## 发布后检查
+
+```bash
+systemctl --no-pager --full status portfolio-site
+curl -I http://127.0.0.1:3000/
+nginx -t
+curl -I https://liyilin.xyz/notes
+```
+
+## 手动回滚
+
+自动回滚只处理启动失败。若上线后发现业务问题，选择上一个 release：
+
+```bash
+ls -1dt /opt/portfolio-site/releases/*
+sudo ln -sfn /opt/portfolio-site/releases/<上一个时间戳> /opt/portfolio-site/current
+sudo systemctl restart portfolio-site
+curl -I http://127.0.0.1:3000/
 ```
 
 ## HTTPS 证书

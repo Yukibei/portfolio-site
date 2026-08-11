@@ -1,0 +1,33 @@
+.page {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.intro {
+  padding: clamp(16px, 1.8vw, 30px);
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.24);
+}
+
+.eyebrow { margin: 0 0 8px; color: var(--txt-dim2); font-size: var(--t-2xs); letter-spacing: .14em; text-transform: uppercase; }
+.lead { margin: 0; max-width: 42rem; color: rgba(255,255,255,.72); font-size: var(--t-sm); line-height: 1.7; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--gap-sm); }
+.stat { padding: clamp(12px,1.1vw,20px); border-radius: var(--r-md); background: rgba(240,250,255,.1); backdrop-filter: blur(12px); }
+.statValue { display: block; font-size: clamp(22px,2.4vw,40px); line-height: 1; }
+.statLabel { display: block; margin-top: 8px; color: var(--txt-dim2); font-size: var(--t-2xs); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--gap-sm); }
+.action { display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border: 0; border-radius: var(--r-pill); background: rgba(255,255,255,.16); color: #fff; font: inherit; font-size: var(--t-xs); text-decoration: none; cursor: pointer; }
+.action:hover { background: rgba(255,255,255,.26); }
+.actionDanger { background: rgba(255,110,110,.22); }
+.grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--gap-sm); min-height: 0; }
+.timeline { display: flex; flex-direction: column; gap: var(--gap-sm); }
+.timelineItem { display: grid; grid-template-columns: 70px 1fr; gap: var(--gap-sm); padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+.timelineDate { color: var(--txt-dim2); font-size: var(--t-2xs); }
+.timelineTitle { color: #fff; font-size: var(--t-xs); text-decoration: none; }
+.timelineTitle:hover { text-decoration: underline; }
+.muted { color: var(--txt-dim2); font-size: var(--t-xs); line-height: 1.6; }
+.select { width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; background: rgba(0,0,0,.14); color: #fff; font: inherit; }
+@media (max-width: 680px) { .grid { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(3,1fr); } .timelineItem { grid-template-columns: 58px 1fr; } }

@@ -1,0 +1,93 @@
+/* 列表行：封面 2:3 书封形态 + 标题副行 + 行尾插槽 */
+
+.rowWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  min-width: 0;
+}
+
+.row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 8px;
+  transition: opacity 0.18s ease;
+}
+
+.row:hover {
+  opacity: 0.82;
+}
+
+.cover {
+  width: clamp(28px, 2.5vw, 44px);
+  aspect-ratio: 2 / 3;
+  flex: none;
+  border-radius: 4px;
+  background-image: var(--cover-gradient);
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.text {
+  min-width: 0;
+  flex: 1;
+}
+
+.title {
+  display: block;
+  min-width: 0;
+  font-size: var(--t-xs);
+  font-weight: 400;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--t-2xs);
+  color: var(--txt-dim2);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track {
+  display: block;
+  height: clamp(3px, 0.28vw, 5px);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.22);
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.pct {
+  flex: none;
+  min-width: 3ch;
+  text-align: right;
+  font-size: var(--t-2xs);
+  color: var(--txt-dim2);
+}
+
+.trailing {
+  flex: none;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.7);
+}

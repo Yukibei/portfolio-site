@@ -1,0 +1,37 @@
+.pixel-loader {
+  --blur: 0;
+  --color: #fff;
+  --wh: calc(var(--wh-number) * 1px);
+  --wh-n: calc(var(--wh-number) * -1px);
+  --zoom: 0.3;
+  position: relative;
+  width: calc(var(--wh-number) * var(--wh));
+  height: calc(var(--wh-number) * var(--wh));
+  margin: 0 auto;
+  filter: drop-shadow(var(--wh-n) 0 var(--blur) var(--color))
+    drop-shadow(0 var(--wh-n) var(--blur) var(--color))
+    drop-shadow(var(--wh) 0 var(--blur) var(--color))
+    drop-shadow(0 var(--wh) var(--blur) var(--color));
+  image-rendering: pixelated;
+  zoom: var(--zoom);
+  animation: pixel-loader-mover 0.3s linear infinite;
+}
+
+.pixel-loader__pixel {
+  width: var(--wh);
+  height: var(--wh);
+  box-shadow: var(--shadow);
+}
+
+@keyframes pixel-loader-mover {
+  0%,
+  100% {
+    --shadow: var(--pixel-frame-a);
+  }
+  33% {
+    --shadow: var(--pixel-frame-b);
+  }
+  66% {
+    --shadow: var(--pixel-frame-c);
+  }
+}

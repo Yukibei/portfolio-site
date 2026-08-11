@@ -2,13 +2,17 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import GithubSlugger from "github-slugger";
+import { SERIES_DEFINITIONS } from "./series";
 import {
   NOTE_CATEGORIES,
+  RESERVED_NOTE_SLUGS,
   type NoteCategory,
   type NoteDocument,
   type NoteFrontmatter,
   type NoteGroup,
   type NoteMeta,
+  type NoteSeries,
+  type NoteSeriesRef,
   type TocItem,
 } from "./types";
 
@@ -18,6 +22,7 @@ export type {
   NoteDocument,
   NoteGroup,
   NoteMeta,
+  NoteSeries,
   TocItem,
 } from "./types";
 
@@ -55,6 +60,27 @@ function readCategory(value: unknown, slug: string): NoteCategory {
   return matched;
 }
 
+function readSeries(value: unknown, slug: string): NoteSeriesRef | undefined {
+  if (value === undefined) return undefined;
+
+  if (typeof value !== "object" || value === null) {
+    fail(slug, "series", "必须是 { slug, order } 对象");
+  }
+
+  const raw = value as Record<string, unknown>;
+  const seriesSlug = raw.slug;
+  const order = raw.order;
+
+  if (typeof seriesSlug !== "string" || !SERIES_DEFINITIONS.some((item) => item.slug === seriesSlug)) {
+    fail(slug, "series.slug", `必须是 series.ts 中已定义的专栏：${SERIES_DEFINITIONS.map((item) => item.slug).join(" / ")}`);
+  }
+  if (typeof order !== "number" || !Number.isInteger(order) || order < 1) {
+    fail(slug, "series.order", "必须是从 1 开始的整数");
+  }
+
+  return { slug: seriesSlug, order };
+}
+
 function readFrontmatter(data: Record<string, unknown>, slug: string): NoteFrontmatter {
   return {
     title: readString(data.title, slug, "title"),
@@ -63,7 +89,13 @@ function readFrontmatter(data: Record<string, unknown>, slug: string): NoteFront
     tags: readTags(data.tags, slug),
     publishedAt: readDate(data.publishedAt, slug),
     readTime: readString(data.readTime, slug, "readTime"),
+    cover: readOptionalString(data.cover),
+    series: readSeries(data.series, slug),
   };
+}
+
+function readOptionalString(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
 function extractToc(source: string): TocItem[] {
@@ -90,6 +122,13 @@ function extractToc(source: string): TocItem[] {
 
 function parseNote(fileName: string): NoteDocument {
   const slug = fileName.replace(/\.mdx$/, "");
+
+  if (RESERVED_NOTE_SLUGS.some((reserved) => reserved === slug)) {
+    throw new Error(
+      `content/notes/posts/${slug}.mdx 的文件名与玻璃系统功能页路由冲突，保留字：${RESERVED_NOTE_SLUGS.join(" / ")}`,
+    );
+  }
+
   const raw = fs.readFileSync(path.join(POSTS_DIR, fileName), "utf8");
   const parsed = matter(raw);
   const frontmatter = readFrontmatter(parsed.data, slug);
@@ -112,7 +151,18 @@ function readAllNotes(): NoteDocument[] {
 }
 
 export function getAllNotes(): NoteMeta[] {
-  return readAllNotes().map(({ source: _source, toc: _toc, ...meta }) => meta);
+  return readAllNotes().map((note) => ({
+    slug: note.slug,
+    title: note.title,
+    summary: note.summary,
+    category: note.category,
+    tags: note.tags,
+    publishedAt: note.publishedAt,
+    displayDate: note.displayDate,
+    readTime: note.readTime,
+    cover: note.cover,
+    series: note.series,
+  }));
 }
 
 export function getNote(slug: string): NoteDocument | undefined {
@@ -125,4 +175,32 @@ export function getNoteGroups(): NoteGroup[] {
     category,
     notes: notes.filter((note) => note.category === category),
   })).filter((group) => group.notes.length > 0);
+}
+
+type SeriesNote = NoteMeta & { series: NoteSeriesRef };
+
+function belongsTo(note: NoteMeta, seriesSlug: string): note is SeriesNote {
+  return note.series?.slug === seriesSlug;
+}
+
+/** 已有文章的专栏，按 series.order 升序；空专栏不返回 */
+export function getSeries(): NoteSeries[] {
+  const notes = getAllNotes();
+
+  return SERIES_DEFINITIONS.map((definition) => {
+    const members = notes
+      .filter((note): note is SeriesNote => belongsTo(note, definition.slug))
+      .sort((a, b) => a.series.order - b.series.order);
+
+    const orders = members.map((note) => note.series.order);
+    if (new Set(orders).size !== orders.length) {
+      throw new Error(`专栏 ${definition.slug} 存在重复的 series.order：${orders.join(", ")}`);
+    }
+
+    return { ...definition, notes: members };
+  }).filter((series) => series.notes.length > 0);
+}
+
+export function getSeriesBySlug(slug: string): NoteSeries | undefined {
+  return getSeries().find((series) => series.slug === slug);
 }

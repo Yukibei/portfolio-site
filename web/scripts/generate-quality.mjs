@@ -37,7 +37,6 @@ function gitShortHash() {
   const r = spawnSync("git", ["rev-parse", "--short", "HEAD"], {
     cwd: webRoot,
     encoding: "utf8",
-    shell: true,
   });
   return r.status === 0 ? r.stdout.trim() : "unknown";
 }

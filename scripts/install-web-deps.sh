@@ -9,4 +9,21 @@ LOG_FILE="$LOG_DIR/install-web-deps.log"
 exec > >(tee "$LOG_FILE") 2>&1
 
 cd "$ROOT_DIR/web"
-npm install "$@"
+
+case "${1:-install}" in
+  exec)
+    shift
+    npm exec -- "$@"
+    ;;
+  install)
+    shift
+    npm install "$@"
+    ;;
+  uninstall)
+    shift
+    npm uninstall "$@"
+    ;;
+  *)
+    npm install "$@"
+    ;;
+esac

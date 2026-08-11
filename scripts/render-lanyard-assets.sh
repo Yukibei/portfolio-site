@@ -19,6 +19,8 @@ fi
 to_win_path() {
   if command -v wslpath >/dev/null 2>&1; then
     wslpath -w "$1"
+  elif command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$1"
   else
     printf '%s' "$1"
   fi
@@ -27,6 +29,8 @@ to_win_path() {
 to_file_url_path() {
   if command -v wslpath >/dev/null 2>&1; then
     wslpath -m "$1"
+  elif command -v cygpath >/dev/null 2>&1; then
+    cygpath -m "$1"
   else
     printf '%s' "$1"
   fi

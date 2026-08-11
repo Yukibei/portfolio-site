@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOG_DIR="$ROOT_DIR/logs"
 RUN_DIR="$ROOT_DIR/.omx/run"
+source "$ROOT_DIR/scripts/lib/next-cache.sh"
 mkdir -p "$LOG_DIR" "$RUN_DIR"
 
 HOST="${HOST:-127.0.0.1}"
@@ -36,25 +37,6 @@ pid_is_running() {
   kill -0 "$pid" >/dev/null 2>&1
 }
 
-clean_next_cache() {
-  local web_dir="$ROOT_DIR/web"
-  local next_dir="$web_dir/.next"
-
-  if [ ! -e "$next_dir" ]; then
-    return
-  fi
-
-  local web_abs
-  local next_abs
-  web_abs="$(cd "$web_dir" && pwd -P)"
-  next_abs="$(cd "$next_dir" && pwd -P)"
-
-  case "$next_abs" in
-    "$web_abs/.next") rm -rf -- "$next_abs" ;;
-    *) echo "Refusing to delete unexpected path: $next_abs" >&2; exit 1 ;;
-  esac
-}
-
 if [ -f "$PID_FILE" ] && pid_is_running "$(cat "$PID_FILE")"; then
   PORT="$(cat "$PORT_FILE" 2>/dev/null || echo "$START_PORT")"
   echo "Dev server already running with PID $(cat "$PID_FILE")"
@@ -64,7 +46,7 @@ fi
 
 "$ROOT_DIR/scripts/stop-dev.sh" --quiet || true
 rm -f "$PID_FILE" "$PORT_FILE"
-clean_next_cache
+clean_next_cache "$ROOT_DIR"
 
 port_is_busy() {
   local port="$1"

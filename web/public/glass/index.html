@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>steary.com — visionOS Streaming UI</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{background:#8d8a86}
+body{
+  margin:0;height:100vh;overflow:hidden;
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  color:#fff;letter-spacing:.02em;-webkit-font-smoothing:antialiased;
+}
+:root{
+  --white:#fff;
+  --txt-dim:rgba(255,255,255,.66);
+  --txt-dim2:rgba(255,255,255,.55);
+  --glass-win:rgba(106,98,94,.40);
+  --glass-pill-dark:rgba(0,0,0,.12);
+  --glass-pill-light:rgba(255,255,255,.30);
+  --stroke-soft:rgba(255,255,255,.12);
+  --dot-green:#59E6B6;
+
+  --pad:clamp(10px,1.35vw,26px);
+  --gap:clamp(9px,1.05vw,20px);
+  --gap-sm:clamp(6px,.7vw,13px);
+  --gap-xs:clamp(4px,.45vw,8px);
+
+  --r-win:clamp(18px,1.9vw,40px);
+  --r-lg:clamp(14px,1.5vw,30px);
+  --r-md:clamp(11px,1.15vw,22px);
+  --r-pill:999px;
+
+  --t-2xs:clamp(9px,.70vw,13px);
+  --t-xs:clamp(10px,.80vw,15px);
+  --t-sm:clamp(11px,.92vw,17px);
+  --t-md:clamp(12px,1.05vw,20px);
+  --t-lg:clamp(15px,1.30vw,26px);
+  --t-xl:clamp(18px,1.65vw,33px);
+  --t-2xl:clamp(21px,2.05vw,42px);
+  --t-hero:clamp(25px,2.95vw,60px);
+
+  --gutter:clamp(44px,calc((100vw - 1000px)/2),140px);
+  --wincols:minmax(180px,23%) 1fr;
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;letter-spacing:inherit}
+a{color:inherit;text-decoration:none}
+svg{display:block}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- background ---------- */
+.bg{
+  position:fixed;inset:0;z-index:0;
+  background:url("https://stone-expand-60400629.figma.site/_assets/v11/6fb936dc2b3ba86a5b0851890365db8daecab54f.png?w=2048") center/cover no-repeat,#8d8a86;
+}
+
+/* ---------- app grid ---------- */
+#app{
+  position:relative;z-index:1;
+  display:grid;height:100vh;
+  grid-template-columns:var(--gutter) 1fr var(--gutter);
+  grid-template-rows:auto 1fr;
+  padding:clamp(10px,1.35vw,26px) 0;
+  row-gap:clamp(9px,1.05vw,20px);
+}
+
+/* ---------- Safari toolbar ---------- */
+.toolbar{
+  grid-column:2;grid-row:1;
+  justify-self:center;width:min(100%,1040px);
+  display:flex;align-items:center;gap:var(--gap-sm);
+  padding:clamp(6px,.55vw,10px) clamp(9px,.8vw,15px);
+  border-radius:var(--r-pill);
+  background:rgba(132,126,125,.44);
+  backdrop-filter:blur(34px) saturate(1.05);
+  -webkit-backdrop-filter:blur(34px) saturate(1.05);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.18),0 24px 54px rgba(0,0,0,.16);
+}
+.tb-nav{display:flex;gap:var(--gap-xs)}
+.tb-circle{
+  width:clamp(22px,1.75vw,32px);aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;background:rgba(255,255,255,.30);
+}
+.tb-icon{
+  width:clamp(24px,1.9vw,34px);aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;color:rgba(255,255,255,.9);
+  transition:background .18s ease;
+}
+.tb-icon:hover{background:rgba(255,255,255,.16)}
+.url{
+  flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:clamp(5px,.5vw,9px) clamp(10px,1vw,18px);
+  border-radius:var(--r-pill);background:rgba(30,30,30,.32);
+  font-size:var(--t-sm);
+}
+.url .aa{position:absolute;left:clamp(12px,1.1vw,20px);font-size:var(--t-xs);color:var(--txt-dim)}
+.url-wrap{position:relative;flex:1;min-width:0;display:flex;align-items:center}
+.url-wrap .side-l,.url-wrap .side-r{
+  position:absolute;top:50%;transform:translateY(-50%);
+  color:var(--txt-dim);font-size:var(--t-xs);
+}
+.url-wrap .side-l{left:clamp(10px,.9vw,16px)}
+.url-wrap .side-r{right:clamp(10px,.9vw,16px)}
+
+/* ---------- left rail ---------- */
+.rail{
+  grid-column:1;grid-row:2;
+  justify-self:center;align-self:center;
+  display:flex;flex-direction:column;gap:var(--gap-xs);
+  padding:clamp(6px,.6vw,11px);
+  border-radius:var(--r-pill);
+  background:rgba(100,95,90,.34);
+  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.28),0 26px 56px rgba(0,0,0,.16);
+}
+.rail button{
+  width:clamp(30px,2.5vw,46px);aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;color:rgba(255,255,255,.8);
+  transition:background .18s ease,transform .16s ease,color .18s ease;
+}
+.rail button:hover{background:rgba(255,255,255,.16);color:#fff}
+.rail button:active{transform:scale(.94)}
+.rail button[aria-current="page"]{background:rgba(255,255,255,.32);color:#fff}
+
+/* ---------- window ---------- */
+.window{
+  grid-column:2;grid-row:2;min-height:0;
+  display:flex;flex-direction:column;
+  border-radius:var(--r-win);
+  background:var(--glass-win);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.36),0 18px 48px rgba(0,0,0,.10);
+  overflow:hidden;
+}
+/* NOTE: .window intentionally has NO backdrop-filter — it would become a
+   backdrop root and child panels could only sample this flat tint. */
+
+.winhead{
+  display:grid;grid-template-columns:var(--wincols);
+  align-items:center;gap:var(--gap);
+  padding:var(--pad) var(--pad) 0;
+}
+.search{
+  display:flex;align-items:center;gap:var(--gap-xs);
+  padding:clamp(7px,.62vw,12px) clamp(11px,.95vw,17px);
+  border-radius:var(--r-pill);background:var(--glass-pill-dark);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  color:var(--txt-dim2);font-size:var(--t-sm);
+}
+.headright{display:flex;align-items:center;gap:var(--gap-sm);min-width:0}
+.tabs{display:flex;align-items:center;gap:var(--gap-xs);margin-right:auto;min-width:0;flex-wrap:wrap}
+.tab{
+  padding:clamp(6px,.55vw,11px) clamp(11px,1vw,19px);
+  border-radius:var(--r-pill);color:var(--txt-dim);
+  font-size:var(--t-sm);font-weight:400;letter-spacing:.045em;
+  transition:background .18s ease,color .18s ease;white-space:nowrap;
+}
+.tab:hover{color:#fff}
+.tab.on{
+  background:rgba(255,255,255,.16);color:#fff;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.3);
+}
+.bell{
+  position:relative;width:clamp(28px,2.3vw,42px);aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;background:rgba(255,255,255,.10);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+.bell i{
+  position:absolute;top:22%;right:24%;width:clamp(5px,.42vw,8px);aspect-ratio:1;
+  border-radius:50%;background:var(--dot-green);
+}
+.profile{
+  display:flex;align-items:center;gap:var(--gap-xs);
+  padding:clamp(3px,.28vw,6px) clamp(11px,.95vw,17px) clamp(3px,.28vw,6px) clamp(3px,.28vw,6px);
+  border-radius:var(--r-pill);background:rgba(255,255,255,.14);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.34);
+}
+.avatar{width:clamp(24px,2vw,36px);aspect-ratio:1;border-radius:50%;overflow:hidden;flex:none}
+.pname{font-size:var(--t-xs);line-height:1.25;white-space:nowrap}
+.phandle{font-size:var(--t-2xs);color:var(--txt-dim2);line-height:1.25;white-space:nowrap}
+
+/* ---------- body ---------- */
+.winbody{
+  flex:1;min-height:0;display:grid;
+  grid-template-columns:var(--wincols);gap:var(--gap);padding:var(--pad);
+}
+.side,.main{display:grid;grid-template-rows:1.15fr 1fr;gap:var(--gap);min-height:0;min-width:0}
+
+.panel{
+  min-height:0;min-width:0;display:flex;flex-direction:column;
+  padding:clamp(11px,1vw,19px);
+  border-radius:var(--r-lg);
+  background:rgba(240,250,255,.10);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.panel h2{margin:0;font-size:var(--t-md);font-weight:500;letter-spacing:.03em}
+.panelhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:var(--gap-sm)}
+.sortby{font-size:var(--t-2xs);color:var(--txt-dim2);white-space:nowrap}
+.list{flex:1;min-height:0;min-width:0;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:var(--gap-sm)}
+.list::-webkit-scrollbar{display:none}
+
+.row{display:flex;align-items:center;gap:var(--gap-sm);min-width:0}
+.cover{
+  width:clamp(28px,2.5vw,44px);aspect-ratio:2/3;border-radius:4px;flex:none;
+  object-fit:cover;background:rgba(255,255,255,.14);
+}
+.rowtext{min-width:0;flex:1}
+.rowtitle{
+  min-width:0;font-size:var(--t-xs);font-weight:400;line-height:1.35;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.rowauthor{font-size:var(--t-2xs);color:var(--txt-dim2);line-height:1.4;margin-top:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rowbtn{color:rgba(255,255,255,.7);flex:none;transition:color .18s ease}
+.rowbtn:hover{color:#fff}
+
+.progress{height:clamp(3px,.28vw,5px);border-radius:var(--r-pill);background:rgba(255,255,255,.22);margin-top:5px;overflow:hidden}
+.progress span{display:block;height:100%;border-radius:var(--r-pill);background:rgba(255,255,255,.9)}
+.pct{font-size:var(--t-2xs);color:var(--txt-dim2);flex:none;min-width:3ch;text-align:right}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;min-height:0;border-radius:var(--r-lg);overflow:hidden;
+  background:#171a2e center/cover no-repeat;
+  background-image:linear-gradient(180deg,rgba(9,24,44,.42),rgba(5,14,30,.72)),url("https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1600&q=80");
+  container-type:size;
+}
+/* --u 必须挂在 .hero 的子元素上：容器自身使用 cqi/cqh 会查询到外层容器 */
+.hero > *{--u:min(1cqi,2.3cqh)}
+.hero .shade-l{position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,5,10,.74) 0%,rgba(2,5,10,.5) 38%,rgba(2,5,10,0) 76%)}
+.hero .shade-b{position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,5,10,0) 52%,rgba(2,5,10,.18) 100%)}
+.herobody{
+  position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:calc(var(--u)*5);
+}
+.chips{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1.2);margin-bottom:calc(var(--u)*2.2)}
+.chip{
+  padding:calc(var(--u)*.8) calc(var(--u)*1.7);border-radius:var(--r-pill);
+  background:rgba(255,255,255,.16);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.3);
+  font-size:calc(var(--u)*1.55);letter-spacing:.05em;white-space:nowrap;
+}
+.herotitle{
+  margin:0;font-size:calc(var(--u)*5.2);font-weight:500;line-height:1.04;letter-spacing:.01em;
+  text-shadow:0 2px 18px rgba(0,0,0,.5);text-wrap:balance;
+}
+.heroauthor{
+  margin:calc(var(--u)*1.3) 0 0;font-size:calc(var(--u)*1.85);color:var(--txt-dim);
+  text-shadow:0 1px 10px rgba(0,0,0,.5);
+}
+.herodesc{
+  margin:calc(var(--u)*1.5) 0 0;max-width:46ch;
+  font-size:calc(var(--u)*1.72);font-weight:300;line-height:1.6;color:rgba(255,255,255,.78);
+  text-shadow:0 1px 12px rgba(0,0,0,.5);text-wrap:pretty;
+}
+.herobtns{display:flex;align-items:center;gap:calc(var(--u)*1.3);margin-top:calc(var(--u)*2.6);flex-wrap:wrap}
+.btn-primary{
+  display:flex;align-items:center;gap:calc(var(--u)*1);
+  padding:calc(var(--u)*1.25) calc(var(--u)*2.6);border-radius:var(--r-pill);
+  background:#fff;color:#14161c;font-size:calc(var(--u)*1.7);font-weight:500;
+}
+.btn-ghost{
+  display:flex;align-items:center;gap:calc(var(--u)*1);
+  padding:calc(var(--u)*1.25) calc(var(--u)*2.6);border-radius:var(--r-pill);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.4);
+  font-size:calc(var(--u)*1.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:background .18s ease;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.btn-round{
+  width:calc(var(--u)*4.3);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.4);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.heroarrows{position:absolute;right:calc(var(--u)*4);bottom:calc(var(--u)*4);display:flex;gap:calc(var(--u)*1.4)}
+.arrow{
+  width:calc(var(--u)*4.6);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.16);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.34);
+}
+.arrow.dim{opacity:.45}
+
+/* ---------- recommendations ---------- */
+/* container-type 必须挂在父级：容器查询无法查询声明容器的元素自身 */
+.reco{min-height:0;min-width:0;display:flex;flex-direction:column;gap:var(--gap-sm);container-type:inline-size}
+.recohead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.recohead h2{margin:0;font-size:var(--t-md);font-weight:500;letter-spacing:.03em}
+.seeall{
+  padding:clamp(5px,.45vw,9px) clamp(10px,.9vw,16px);border-radius:var(--r-pill);
+  background:rgba(255,255,255,.14);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.3);
+  font-size:var(--t-2xs);white-space:nowrap;
+}
+.strip{
+  flex:1;min-height:0;min-width:0;display:grid;gap:var(--gap-sm);
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+@container (min-width:700px){.strip{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.card{
+  position:relative;min-height:0;border-radius:var(--r-md);overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:clamp(8px,.75vw,14px);
+  transition:opacity .18s ease;
+}
+.card:hover{opacity:.92}
+.card .art{position:absolute;inset:0;background-position:center;background-size:cover;opacity:.85}
+.card .fade{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 0% 50%,rgba(8,10,15,.16) 57%,rgba(8,10,15,.58) 72%,rgba(8,10,15,.88) 100%);
+}
+.card .top{position:absolute;top:clamp(7px,.6vw,12px);right:clamp(7px,.6vw,12px);display:flex;gap:6px}
+.cardbtn{
+  width:clamp(20px,1.6vw,28px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.18);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.34);
+}
+.cardbtn.solid{background:#fff;color:#14161c}
+.card .bottomright{position:absolute;right:clamp(7px,.6vw,12px);bottom:clamp(7px,.6vw,12px)}
+.genre{
+  position:relative;align-self:flex-start;margin-bottom:5px;
+  padding:3px 9px;border-radius:var(--r-pill);
+  background:rgba(255,255,255,.18);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  font-size:var(--t-2xs);
+}
+.cardtitle{position:relative;font-size:var(--t-xs);font-weight:500;line-height:1.25;text-wrap:balance}
+.cardauthor{position:relative;font-size:var(--t-2xs);color:var(--txt-dim2);margin-top:2px}
+.rating{position:relative;display:flex;align-items:center;gap:4px;margin-top:4px;font-size:var(--t-2xs)}
+.star{color:#f5b72e}
+
+/* ---------- mobile menu ---------- */
+.burger{display:none;width:clamp(28px,2.3vw,42px);aspect-ratio:1;border-radius:50%;
+  place-items:center;background:rgba(255,255,255,.14);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.burger span{display:block;width:16px;height:1.5px;background:#fff;border-radius:2px;
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .16s ease}
+.burger span+span{margin-top:4px}
+.burger.on span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.burger.on span:nth-child(2){opacity:0}
+.burger.on span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+.menu{
+  position:absolute;top:calc(100% + 8px);right:var(--pad);left:var(--pad);z-index:9;
+  padding:16px;border-radius:var(--r-lg);
+  background:linear-gradient(135deg,rgba(255,255,255,.20),rgba(255,255,255,.075) 48%,rgba(255,255,255,.12)),rgba(58,53,51,.42);
+  backdrop-filter:blur(38px) saturate(1.45) brightness(1.08);
+  -webkit-backdrop-filter:blur(38px) saturate(1.45) brightness(1.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),0 18px 44px rgba(24,20,18,.24);
+  opacity:0;visibility:hidden;transform:translateY(-8px) scale(.98);
+  transition:opacity .18s ease,transform .22s cubic-bezier(.2,.8,.2,1),visibility .22s;
+}
+.menu.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.menu h3{margin:0 0 8px;font-size:var(--t-2xs);color:var(--txt-dim2);letter-spacing:.14em;text-transform:uppercase}
+.menugrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px}
+.menugrid a{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.10);font-size:var(--t-xs);
+  transition:background .18s ease,transform .16s ease}
+.menugrid a:hover{background:rgba(255,255,255,.18)}
+.menugrid a:active{transform:scale(.98)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1180px){
+  :root{--wincols:minmax(190px,27%) 1fr}
+  .phandle{display:none}
+}
+@media (max-width:1130px){
+  :root{--gutter:clamp(10px,1.35vw,26px)}
+  #app{grid-template-columns:var(--gutter) 1fr var(--gutter)}
+  .rail{
+    position:fixed;left:50%;bottom:18px;top:auto;z-index:20;
+    grid-column:unset;grid-row:unset;justify-self:auto;align-self:auto;
+    flex-direction:row;transform:translateX(-50%);overflow:hidden;
+    background:
+      linear-gradient(135deg,rgba(255,255,255,.20),rgba(255,255,255,.075) 48%,rgba(255,255,255,.12)),
+      rgba(58,53,51,.30);
+    backdrop-filter:blur(38px) saturate(1.45) brightness(1.08);
+    -webkit-backdrop-filter:blur(38px) saturate(1.45) brightness(1.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.42),
+      inset 0 -1px 0 rgba(255,255,255,.08),
+      0 2px 5px rgba(24,20,18,.10),
+      0 18px 44px rgba(24,20,18,.24);
+  }
+  .rail::before{
+    content:"";position:absolute;left:8%;right:8%;top:0;height:42%;pointer-events:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,0));
+    filter:blur(6px);border-radius:var(--r-pill);
+  }
+  .rail::after{
+    content:"";position:absolute;left:6%;top:6%;width:38%;height:44%;pointer-events:none;
+    background:radial-gradient(ellipse at center,rgba(255,255,255,.22),rgba(255,255,255,0) 70%);
+  }
+  .rail button[aria-current="page"]{
+    background:linear-gradient(145deg,rgba(255,255,255,.46),rgba(255,255,255,.22));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .window{margin-bottom:0}
+}
+@media (max-width:900px){
+  body{overflow:auto}
+  #app{height:auto;min-height:100vh}
+  .window{min-height:0}
+  .winbody{grid-template-columns:1fr;padding-bottom:calc(var(--pad) + 64px)}
+  .winhead{grid-template-columns:1fr}
+  .side{grid-template-rows:none;grid-template-columns:1fr 1fr}
+  .main{grid-template-rows:none}
+  .hero{min-height:46vh}
+  .panel{max-height:46vh}
+  .strip{min-height:34vh}
+  .pname,.phandle{display:none}
+  .profile{padding:4px}
+}
+@media (max-width:680px){
+  .tab:not(.on){display:none}
+  .tb-hide{display:none}
+}
+@media (max-width:520px){
+  .tabs{display:none}
+  .bell{display:none}
+  .profile{display:none}
+  .burger{display:grid}
+  .winhead{position:relative;grid-template-columns:1fr auto;gap:var(--gap-xs)}
+  .side{grid-template-columns:1fr}
+  .strip{
+    display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+    scrollbar-width:none;min-height:38vh;
+  }
+  .strip::-webkit-scrollbar{display:none}
+  .card{flex:0 0 62%;scroll-snap-align:start;aspect-ratio:.821}
+  .hero{min-height:40vh}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div id="app">
+
+  <!-- ============ Safari toolbar ============ -->
+  <header class="toolbar" aria-label="Browser toolbar">
+    <div class="tb-nav">
+      <span class="tb-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3a3633" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+      <span class="tb-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3a3633" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+    </div>
+    <button class="tb-icon tb-hide" aria-label="Sidebar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="tb-icon tb-hide" aria-label="Shield"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/></svg></button>
+
+    <div class="url-wrap">
+      <span class="side-l">AA</span>
+      <div class="url">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+        <span>steary.com</span>
+      </div>
+      <span class="side-r"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg></span>
+    </div>
+
+    <button class="tb-icon tb-hide" aria-label="Share"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M8 8l4-4 4 4"/><path d="M5 13v5a2 2 0 002 2h10a2 2 0 002-2v-5"/></svg></button>
+    <button class="tb-icon tb-hide" aria-label="New tab"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="tb-icon" aria-label="Tabs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="13" height="13" rx="2"/><path d="M8 7V6a2 2 0 012-2h9a2 2 0 012 2v9a2 2 0 01-2 2h-1"/></svg></button>
+  </header>
+
+  <!-- ============ left rail ============ -->
+  <nav class="rail" aria-label="Primary">
+    <button aria-label="Home" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></button>
+    <button aria-label="Discover"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg></button>
+    <button aria-label="Library"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h6a2 2 0 012 2v13a2 2 0 00-2-2H4z"/><path d="M20 5h-6a2 2 0 00-2 2v13a2 2 0 012-2h6z"/></svg></button>
+    <button aria-label="Bookmarks"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v17l-6-4.5L6 21z"/></svg></button>
+    <button aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1A1.6 1.6 0 008 19.4a1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H2a2 2 0 110-4h.1A1.6 1.6 0 003.6 8a1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H8a1.6 1.6 0 001-1.5V2a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V8a1.6 1.6 0 001.5 1H22a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg></button>
+  </nav>
+
+  <!-- ============ window ============ -->
+  <section class="window">
+
+    <header class="winhead">
+      <div class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <span>Search books</span>
+      </div>
+
+      <div class="headright">
+        <div class="tabs" id="tabs">
+          <button class="tab on">Discover</button>
+          <button class="tab">Fiction</button>
+          <button class="tab">Non-fiction</button>
+          <button class="tab">Mystery</button>
+          <button class="tab">More</button>
+        </div>
+
+        <button class="bell" aria-label="Notifications">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+          <i></i>
+        </button>
+
+        <div class="profile">
+          <span class="avatar">
+            <svg viewBox="0 0 40 40" width="100%" height="100%" aria-hidden="true">
+              <circle cx="20" cy="20" r="20" fill="#5b3fd4"/>
+              <path d="M8 40c0-7 5.4-11 12-11s12 4 12 11z" fill="#ef7a35"/>
+              <circle cx="20" cy="17" r="8" fill="#f6c9a4"/>
+              <path d="M12 15c0-5 3.6-8 8-8s8 3 8 8c0-2-3-3.5-8-3.5S12 13 12 15z" fill="#2b2118"/>
+            </svg>
+          </span>
+          <span>
+            <div class="pname">Arfi Maulana</div>
+            <div class="phandle">@arfimaulana_</div>
+          </span>
+        </div>
+
+        <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+      <div class="menu" id="menu">
+        <h3>Browse</h3>
+        <div class="menugrid">
+          <a href="#">Discover</a><a href="#">Fiction</a>
+          <a href="#">Non-fiction</a><a href="#">Mystery</a>
+        </div>
+        <h3>Your library</h3>
+        <div class="menugrid">
+          <a href="#">Continue</a><a href="#">Saved</a>
+          <a href="#">Finished</a><a href="#">Settings</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="winbody">
+
+      <!-- ---- side column ---- -->
+      <div class="side">
+        <div class="panel">
+          <div class="panelhead">
+            <h2>New Releases</h2>
+            <span class="sortby">Sort by: Latest</span>
+          </div>
+          <div class="list" id="releases"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panelhead"><h2>Continue Reading</h2></div>
+          <div class="list" id="continue"></div>
+        </div>
+      </div>
+
+      <!-- ---- main column ---- -->
+      <div class="main">
+        <div class="hero">
+          <div class="shade-l"></div>
+          <div class="shade-b"></div>
+          <div class="herobody">
+            <div class="chips">
+              <span class="chip">Editor's Pick</span>
+              <span class="chip">Dark Fantasy</span>
+              <span class="chip">Mystery</span>
+            </div>
+            <h1 class="herotitle">The Starless Archive</h1>
+            <p class="heroauthor">Elian Voss</p>
+            <p class="herodesc">Beneath a drowned city, a disgraced archivist discovers a library that remembers every future erased from the stars.</p>
+            <div class="herobtns">
+              <button class="btn-primary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H19v15H6.5A2.5 2.5 0 004 20.5z"/><path d="M4 20.5A2.5 2.5 0 016.5 18H19v3H6.5"/></svg>
+                Read Now
+              </button>
+              <button class="btn-ghost">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v17l-6-4.5L6 21z"/></svg>
+                Save
+              </button>
+              <button class="btn-round" aria-label="More">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="heroarrows">
+            <button class="arrow dim" aria-label="Previous"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="arrow" aria-label="Next"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+          </div>
+        </div>
+
+        <div class="reco">
+          <div class="recohead">
+            <h2>You might like</h2>
+            <button class="seeall">See all</button>
+          </div>
+          <div class="strip" id="strip"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<script>
+const RELEASES = [
+  ["Fourth Wing","Rebecca Yarros","fourthwing"],
+  ["Iron Flame","Rebecca Yarros","ironflame"],
+  ["The Housemaid","Freida McFadden","housemaid"],
+  ["Project Hail Mary","Andy Weir","hailmary"],
+  ["Tomorrow, and Tomorrow, and Tomorrow","Gabrielle Zevin","tomorrow"],
+  ["Yellowface","R. F. Kuang","yellowface"],
+];
+const CONTINUE = [
+  ["Atomic Habits","James Clear",56,"atomic"],
+  ["The Midnight Library","Matt Haig",32,"midnight"],
+  ["Educated","Tara Westover",18,"educated"],
+  ["Sapiens","Yuval Noah Harari",71,"sapiens"],
+  ["The Psychology of Money","Morgan Housel",43,"money"],
+  ["Circe","Madeline Miller",24,"circe"],
+];
+const CARDS = [
+  ["Dune","Frank Herbert","Sci-Fi","4.6","#8a4a2c,#5c3a30,#20242f","dune"],
+  ["The Hobbit","J.R.R. Tolkien","Fantasy","4.8","#57636b,#39424a,#191d24","hobbit"],
+  ["The Silent Patient","Alex Michaelides","Mystery","4.3","#2b3fa0,#5a2c8f,#171a3a","silent"],
+  ["Lessons in Chemistry","Bonnie Garmus","Fiction","4.5","#7c7466,#4c5158,#171b22","chemistry"],
+  ["The Book Thief","Markus Zusak","Fiction","4.6","#665443,#3d3028,#171515","thief"],
+];
+const cover = (seed) => `https://picsum.photos/seed/${seed}/160/240`;
+const BOOKMARK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v17l-6-4.5L6 21z"/></svg>';
+
+document.getElementById("releases").innerHTML = RELEASES.map(([t,a,s]) => `
+  <div class="row">
+    <img class="cover" src="${cover(s)}" alt="" loading="lazy">
+    <div class="rowtext">
+      <div class="rowtitle">${t}</div>
+      <div class="rowauthor">${a}</div>
+    </div>
+    <button class="rowbtn" aria-label="Save ${t}">${BOOKMARK}</button>
+  </div>`).join("");
+
+document.getElementById("continue").innerHTML = CONTINUE.map(([t,a,p,s]) => `
+  <div class="row">
+    <img class="cover" src="${cover(s)}" alt="" loading="lazy">
+    <div class="rowtext">
+      <div class="rowtitle">${t}</div>
+      <div class="rowauthor">${a}</div>
+      <div class="progress"><span style="width:${p}%"></span></div>
+    </div>
+    <span class="pct">${p}%</span>
+  </div>`).join("");
+
+document.getElementById("strip").innerHTML = CARDS.map(([t,a,g,r,grad,s]) => {
+  const [c1,c2,c3] = grad.split(",");
+  return `
+  <article class="card" style="background:linear-gradient(165deg,${c1},${c2} 55%,${c3})">
+    <div class="art" style="background-image:url('https://picsum.photos/seed/${s}/400/500')"></div>
+    <div class="fade"></div>
+    <div class="top">
+      <button class="cardbtn" aria-label="More about ${t}">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>
+      </button>
+    </div>
+    <span class="genre">${g}</span>
+    <div class="cardtitle">${t}</div>
+    <div class="cardauthor">${a}</div>
+    <div class="rating">${r} <span class="star">★</span></div>
+    <div class="bottomright">
+      <button class="cardbtn solid" aria-label="Save ${t}">${BOOKMARK}</button>
+    </div>
+  </article>`;
+}).join("");
+
+// tabs
+document.getElementById("tabs").addEventListener("click", (e) => {
+  const tab = e.target.closest(".tab");
+  if (!tab) return;
+  document.querySelectorAll("#tabs .tab").forEach((t) => t.classList.toggle("on", t === tab));
+});
+
+// mobile menu
+const burger = document.getElementById("burger");
+const menu = document.getElementById("menu");
+const setMenu = (open) => {
+  burger.classList.toggle("on", open);
+  menu.classList.toggle("open", open);
+  burger.setAttribute("aria-expanded", String(open));
+};
+burger.addEventListener("click", (e) => { e.stopPropagation(); setMenu(!menu.classList.contains("open")); });
+document.addEventListener("click", (e) => { if (!menu.contains(e.target)) setMenu(false); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
+window.addEventListener("resize", () => { if (window.innerWidth > 520) setMenu(false); });
+</script>
+</body>
+</html>

@@ -12,9 +12,8 @@
     display: flex;
     flex-direction: column;
     background:
-      linear-gradient(135deg, rgba(0,166,255,0.08), transparent 30%),
-      linear-gradient(315deg, rgba(255,59,92,0.07), transparent 30%),
-      #fff;
+      linear-gradient(145deg, rgba(52,211,153,0.11), transparent 30%),
+      #f7f8f7;
     color: #111;
     font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
   }
@@ -31,7 +30,7 @@
     z-index: 1;
     height: 190px;
     margin-top: 96px;
-    background: linear-gradient(90deg, #111 0 58%, #00a6ff 58% 76%, #ff3b5c 76%);
+    background: linear-gradient(90deg, #111 0 72%, #34d399 72%);
   }
   .top {
     position: relative;
@@ -41,7 +40,20 @@
     align-items: center;
     padding: 88px 112px 0;
   }
-  .top img { width: 540px; }
+  .brand { display: flex; align-items: baseline; gap: 30px; }
+  .brand .mark {
+    font-family: "Arial Black", Arial, sans-serif;
+    font-size: 96px;
+    font-weight: 900;
+    line-height: 0.85;
+  }
+  .brand .meta {
+    color: #555;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 7px;
+  }
   .top .tag {
     text-align: right;
     font-size: 40px;
@@ -68,7 +80,7 @@
     padding: 36px;
     border: 8px solid #111;
     background: #fff;
-    box-shadow: 30px 30px 0 rgba(0,166,255,0.13), -30px -30px 0 rgba(255,59,92,0.1);
+    box-shadow: 30px 30px 0 rgba(52,211,153,0.16), -30px -30px 0 rgba(17,17,17,0.08);
   }
   .qr-box img { width: 100%; display: block; image-rendering: pixelated; }
   .scan .title {
@@ -131,8 +143,8 @@
     letter-spacing: 6px;
     text-align: center;
   }
-  .chip.blue { border-color: #00a6ff; color: #0066ff; }
-  .chip.red { border-color: #ff3b5c; color: #ff1744; }
+  .chip.primary { border-color: #34d399; color: #087f5b; }
+  .chip.muted { border-color: #111; color: #111; }
   .footer {
     position: relative;
     z-index: 1;
@@ -153,7 +165,10 @@
 <body>
   <div class="stripe"></div>
   <header class="top">
-    <img src="bytedance.svg" alt="ByteDance">
+    <div class="brand">
+      <span class="mark">YL.</span>
+      <span class="meta">PORTFOLIO ID</span>
+    </div>
     <div class="tag">背面信息<span>BACK SIDE</span></div>
   </header>
 
@@ -169,17 +184,17 @@
   <section class="records">
     <div class="row"><span class="k">姓名 NAME</span><span class="v">李怡霖 / YILING LI</span></div>
     <div class="row"><span class="k">邮箱 EMAIL</span><span class="v">2747028274@qq.com</span></div>
-    <div class="row"><span class="k">岗位 ROLE</span><span class="v">AI APPLICATION ENGINEER</span></div>
-    <div class="row"><span class="k">权限 ACCESS</span><span class="v">OFFICE / LAB / CLOUD</span></div>
+    <div class="row"><span class="k">岗位 ROLE</span><span class="v">AI APP &amp; FULL-STACK</span></div>
+    <div class="row"><span class="k">主页 WEBSITE</span><span class="v">LIYILIN.XYZ</span></div>
   </section>
 
   <section class="chips">
-    <div class="chip blue">AI PLATFORM</div>
-    <div class="chip red">R&amp;D INTERN</div>
+    <div class="chip primary">AI AGENTS</div>
+    <div class="chip muted">FULL-STACK</div>
   </section>
 
   <footer class="footer">
-    <span>BYTEDANCE · EMPLOYEE CARD</span>
+    <span>YILING LI · PORTFOLIO ID</span>
     <span>2026</span>
   </footer>
 </body>

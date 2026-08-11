@@ -1,11 +1,38 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Award, Crown } from "lucide-react";
 import { STATS } from "./constants";
 
 const VIDEO_URL = "/hero-video.mp4?v=3";
 const POSTER_URL = "/hero-poster.jpg";
+
+function HeroBackdrop() {
+  const [videoEnabled, setVideoEnabled] = useState(false);
+
+  useEffect(() => {
+    const pointerQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const syncVideoPolicy = () => setVideoEnabled(pointerQuery.matches);
+
+    syncVideoPolicy();
+    pointerQuery.addEventListener("change", syncVideoPolicy);
+    return () => pointerQuery.removeEventListener("change", syncVideoPolicy);
+  }, []);
+
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-cover bg-[70%_center]"
+        style={{
+          backgroundImage: `url(${POSTER_URL})`,
+          filter: "brightness(1.12) saturate(1.04)",
+        }}
+      />
+      {videoEnabled ? <BackgroundVideo /> : null}
+    </>
+  );
+}
 
 function BackgroundVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -15,25 +42,44 @@ function BackgroundVideo() {
     if (!video) return;
 
     const SENSITIVITY = 0.8;
+    const SEEK_INTERVAL_MS = 45;
     let prevX: number | null = null;
     let targetTime = 0;
     let rafId = 0;
+    let lastSeekAt = 0;
 
-    const tick = () => {
+    const seekToTarget = () => {
+      rafId = 0;
       if (
-        video.duration &&
-        !Number.isNaN(video.duration) &&
-        video.readyState >= 1 &&
-        !video.seeking &&
-        Math.abs(video.currentTime - targetTime) > 0.02
+        !video.duration ||
+        Number.isNaN(video.duration) ||
+        video.readyState < 1 ||
+        video.seeking
       ) {
-        video.currentTime = targetTime;
+        return;
       }
-      rafId = requestAnimationFrame(tick);
+
+      const now = performance.now();
+      if (now - lastSeekAt < SEEK_INTERVAL_MS) {
+        rafId = requestAnimationFrame(seekToTarget);
+        return;
+      }
+
+      if (Math.abs(video.currentTime - targetTime) > 0.08) {
+        video.currentTime = targetTime;
+        lastSeekAt = now;
+      }
+    };
+
+    const scheduleSeek = () => {
+      if (!rafId) rafId = requestAnimationFrame(seekToTarget);
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (window.scrollY > window.innerHeight * 0.9) return;
+      if (window.scrollY > window.innerHeight * 0.9) {
+        prevX = null;
+        return;
+      }
       if (prevX === null) {
         prevX = e.clientX;
         return;
@@ -44,13 +90,13 @@ function BackgroundVideo() {
       const offset =
         (delta / window.innerWidth) * SENSITIVITY * video.duration;
       targetTime = Math.min(Math.max(targetTime + offset, 0), video.duration);
+      scheduleSeek();
     };
 
-    window.addEventListener("mousemove", onMouseMove);
-    rafId = requestAnimationFrame(tick);
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
-      cancelAnimationFrame(rafId);
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -63,59 +109,68 @@ function BackgroundVideo() {
       preload="metadata"
       poster={POSTER_URL}
       className="absolute inset-0 h-full w-full object-cover"
-      style={{ objectPosition: "70% center" }}
+      style={{
+        objectPosition: "70% center",
+        filter: "brightness(1.12) saturate(1.04)",
+      }}
     />
   );
 }
 
 export default function HeroSection() {
   return (
-    <section className="sticky top-0 h-screen w-full overflow-hidden bg-black">
-      <BackgroundVideo />
+    <section className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-black">
+      <HeroBackdrop />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.30),rgba(0,0,0,0.08)_68%,rgba(0,0,0,0.02))]"
+      />
 
-      <div className="relative z-[1] flex h-full flex-col justify-center px-6 pt-20 sm:px-10 lg:px-16">
-        <div className="animate-fade-up mb-6 flex items-center gap-3 lg:mb-8">
-          <Crown className="h-4 w-4 text-white/70" />
-          <span className="font-inter text-xs uppercase tracking-[0.3em] text-white/70 sm:text-sm">
-            AI Application &amp; Full-Stack Engineer
-          </span>
-        </div>
+      <div className="hero-layout relative z-[1] flex h-full flex-col px-6 pb-6 pt-24 sm:px-10 sm:pb-8 sm:pt-28 lg:px-16 lg:pb-10 lg:pt-28">
+        <div className="shrink-0">
+          <div className="hero-tagline animate-fade-up mb-4 flex items-center gap-3 lg:mb-5">
+            <Crown className="h-4 w-4 shrink-0 text-white/70" />
+            <span className="font-inter text-xs uppercase tracking-[0.3em] text-white/70 sm:text-sm">
+              AI Application &amp; Full-Stack Engineer
+            </span>
+          </div>
 
-        <h1 className="animate-fade-up-delay-1 font-podium uppercase leading-[0.92] tracking-tight text-white">
-          <span className="block text-[clamp(2.8rem,8vw,7rem)]">Build.</span>
-          <span className="block text-[clamp(2.8rem,8vw,7rem)]">Deploy.</span>
-          <span className="block text-[clamp(2.8rem,8vw,7rem)]">Deliver.</span>
-        </h1>
+          <h1 className="hero-title animate-fade-up-delay-1 font-podium text-[3.4rem] uppercase leading-[0.98] tracking-tight text-white sm:text-[4.5rem] md:text-[5.5rem] lg:text-[6.25rem] xl:text-[7rem]">
+            <span className="block">Build.</span>
+            <span className="block">Deploy.</span>
+            <span className="block">Deliver.</span>
+          </h1>
 
-        <p className="animate-fade-up-delay-2 mt-6 max-w-md font-inter text-sm leading-relaxed text-white/70 sm:text-base lg:mt-8">
-          I turn AI capabilities into real products,
-          <br />
-          from agents &amp; RAG to full-stack apps -{" "}
-          <span className="font-bold text-white">they ship.</span>
-        </p>
-        <p className="animate-fade-up-delay-2 mt-3 font-inter text-xs tracking-[0.25em] text-white/45 sm:text-sm">
-          把 AI 能力做成可上线的产品 - 不止于 Demo。
-        </p>
+          <p className="hero-description animate-fade-up-delay-2 mt-4 max-w-md font-inter text-sm leading-relaxed text-white/70 sm:mt-5 sm:text-base lg:mt-6">
+            I turn AI capabilities into real products,
+            <br />
+            from agents &amp; RAG to full-stack apps -{" "}
+            <span className="font-bold text-white">they ship.</span>
+          </p>
+          <p className="hero-cn animate-fade-up-delay-2 mt-2 font-inter text-xs tracking-[0.25em] text-white/45 sm:text-sm">
+            把 AI 能力做成可上线的产品 - 不止于 Demo。
+          </p>
 
-        <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap items-center gap-4 sm:gap-6 lg:mt-10">
-          <a
-            href="#projects"
-            className="group flex items-center gap-2 bg-black px-5 py-3 font-inter text-[11px] uppercase tracking-widest text-white transition-colors hover:bg-neutral-900 sm:px-7 sm:py-4 sm:text-xs"
-          >
-            SEE MY WORK
-            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-          </a>
+          <div className="hero-actions animate-fade-up-delay-3 mt-6 flex flex-wrap items-center gap-4 sm:gap-6 lg:mt-8">
+            <a
+              href="#projects"
+              className="group flex items-center gap-2 bg-black px-5 py-3 font-inter text-[11px] uppercase tracking-widest text-white transition-colors hover:bg-neutral-900 sm:px-7 sm:py-4 sm:text-xs"
+            >
+              SEE MY WORK
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
 
-          <div className="hidden items-center gap-3 sm:flex">
-            <Award className="h-8 w-8 text-white/50" />
-            <div className="font-inter text-xs uppercase tracking-wider text-white/60">
-              <div>2x National</div>
-              <div>Award Winner</div>
+            <div className="hero-award hidden items-center gap-3 sm:flex">
+              <Award className="h-8 w-8 text-white/50" />
+              <div className="font-inter text-xs uppercase tracking-wider text-white/60">
+                <div>2x National</div>
+                <div>Award Winner</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="animate-fade-up-delay-4 mt-8 flex flex-wrap gap-6 sm:mt-10 sm:gap-12 lg:mt-14 lg:gap-16">
+        <div className="hero-stats animate-fade-up-delay-4 mt-auto flex shrink-0 flex-wrap gap-6 pt-6 sm:gap-12 lg:gap-16">
           {STATS.map((stat) => (
             <div key={stat.label}>
               <div className="font-inter text-2xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">

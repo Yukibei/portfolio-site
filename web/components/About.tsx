@@ -33,7 +33,7 @@ export default function About() {
             { text: "，2026 届计算机科学与技术本科生。\n\n我做的事情很简单：" },
             {
               text: "把 AI 能力做成真正可上线的产品",
-              className: "font-bold",
+              className: "font-bold text-emerald-400",
             },
             {
               text: " —— 从 RAG、多智能体编排，到前后端与部署的完整闭环。",

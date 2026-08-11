@@ -1,0 +1,25 @@
+.frame {
+  min-width: 0;
+  margin: 0;
+}
+
+.canvas {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border: 1px solid #e2e2e2;
+  background: #f4f4f2;
+}
+
+.media {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.caption {
+  padding-top: 8px;
+  color: #888;
+  font-size: 12px;
+  line-height: 1.6;
+}

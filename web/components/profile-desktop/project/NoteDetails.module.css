@@ -1,0 +1,178 @@
+.root {
+  color: #181818;
+}
+
+.cover {
+  display: block;
+  width: 100%;
+  max-height: 36vh;
+  object-fit: cover;
+}
+
+.header {
+  display: grid;
+  gap: 12px;
+  padding: 24px 2px 22px;
+}
+
+.kicker {
+  color: #777;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.title {
+  max-width: 15ch;
+  margin: 0;
+  font-family: var(--font-podium), Georgia, serif;
+  font-size: clamp(30px, 4vw, 50px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.summary {
+  max-width: 62ch;
+  margin: 0;
+  color: #555;
+  font-size: 16px;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.tag {
+  padding: 7px 10px;
+  border: 1px solid #d8d8d8;
+  background: #f7f7f5;
+  color: #333;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.story {
+  border-top: 1px solid #d9d9d9;
+}
+
+.storyItem {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 16px;
+  padding: 20px 2px;
+  border-bottom: 1px solid #e9e9e9;
+}
+
+.storyIndex {
+  color: #aaa;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.storyText {
+  max-width: 68ch;
+  margin: 0;
+  color: #404040;
+  font-size: 14px;
+  line-height: 1.8;
+  text-wrap: pretty;
+}
+
+.contactHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 2px 14px;
+}
+
+.contactTitle {
+  margin: 0;
+  font-family: var(--font-podium), Georgia, serif;
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+.contactHint {
+  margin: 0;
+  color: #888;
+  font-size: 12px;
+}
+
+.contacts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+}
+
+.contact {
+  min-width: 0;
+  padding: 14px 12px 16px 2px;
+}
+
+.contact + .contact {
+  padding-left: 16px;
+  border-left: 1px solid #ddd;
+}
+
+.contactLabel {
+  margin-bottom: 6px;
+  color: #999;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.contactValue {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.contactLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.contactLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding-top: 18px;
+  }
+
+  .storyItem {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .contactHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .contacts {
+    grid-template-columns: 1fr;
+  }
+
+  .contact + .contact {
+    padding-left: 2px;
+    border-top: 1px solid #ddd;
+    border-left: 0;
+  }
+}

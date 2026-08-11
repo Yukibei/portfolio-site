@@ -1,0 +1,143 @@
+.stage {
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.art {
+  display: block;
+  filter: drop-shadow(0 20px 34px rgba(0, 0, 0, 0.32));
+  height: min(28dvh, 320px);
+  max-width: 28vw;
+  object-fit: contain;
+  position: absolute;
+  top: var(--row-center);
+  transform: translateY(-50%);
+  user-select: none;
+  will-change: transform, opacity;
+}
+
+.art:nth-child(2n) {
+  animation-delay: -1.35s;
+}
+
+.art:nth-child(3n) {
+  animation-delay: -2.7s;
+}
+
+.art:nth-child(5n) {
+  animation-delay: -3.8s;
+}
+
+.openingLeftTop {
+  animation: floatLeft 4.8s ease-in-out infinite;
+  left: 7.5vw;
+  height: min(34dvh, 370px);
+  --row-center: 30%;
+}
+
+.openingRightTop {
+  animation: floatRight 5.2s ease-in-out infinite;
+  right: 7.5vw;
+  height: min(34dvh, 370px);
+  --row-center: 26%;
+}
+
+.openingLeftMiddle {
+  animation: floatRight 5.1s ease-in-out infinite reverse;
+  left: 23vw;
+  height: min(32dvh, 350px);
+  --row-center: 51%;
+}
+
+.openingLeftBottom {
+  animation: floatRight 5.6s ease-in-out infinite reverse;
+  left: 7.5vw;
+  height: min(33dvh, 360px);
+  --row-center: 77%;
+}
+
+.openingRightBottom {
+  animation: floatRight 5.4s ease-in-out infinite reverse;
+  right: 7.5vw;
+  height: min(36dvh, 390px);
+  --row-center: 77%;
+}
+
+.openingRightMiddle {
+  animation: floatLeft 5.7s ease-in-out infinite;
+  right: 23vw;
+  height: min(32dvh, 350px);
+  --row-center: 51%;
+}
+
+.closingLeftTop {
+  animation: floatLeft 5.5s ease-in-out infinite;
+  left: 7vw;
+  height: min(34dvh, 370px);
+  --row-center: 29%;
+}
+
+.closingLeftBottom {
+  animation: floatRight 6s ease-in-out infinite reverse;
+  left: calc(4.5vw - 10px);
+  height: min(35dvh, 380px);
+  --row-center: 78%;
+}
+
+.closingLeftMiddle {
+  animation: floatRight 5.8s ease-in-out infinite reverse;
+  left: 20vw;
+  height: min(34dvh, 370px);
+  --row-center: 52%;
+}
+
+.closingRightTop {
+  animation: floatRight 5.2s ease-in-out infinite;
+  right: 7.5vw;
+  height: min(40dvh, 430px);
+  --row-center: calc(29% + 30px);
+}
+
+.closingRightMiddle {
+  animation: floatLeft 5.4s ease-in-out infinite reverse;
+  right: calc(18vw + 50px);
+  height: min(35dvh, 380px);
+  --row-center: calc(54.5% + 100px);
+}
+
+.closingRightBottom {
+  animation: floatLeft 5.7s ease-in-out infinite reverse;
+  right: calc(4.5vw - 20px);
+  height: min(35dvh, 380px);
+  --row-center: 78%;
+}
+
+@keyframes floatLeft {
+  0%, 100% { transform: translate3d(-12px, -50%, 0) rotate(-1.5deg); }
+  25% { transform: translate3d(6px, calc(-50% - 5px), 0) rotate(-0.3deg); }
+  50% { transform: translate3d(22px, calc(-50% - 9px), 0) rotate(1.2deg); }
+  75% { transform: translate3d(5px, calc(-50% + 4px), 0) rotate(0.2deg); }
+}
+
+@keyframes floatRight {
+  0%, 100% { transform: translate3d(12px, -50%, 0) rotate(1.4deg); }
+  25% { transform: translate3d(-5px, calc(-50% + 4px), 0) rotate(0.3deg); }
+  50% { transform: translate3d(-22px, calc(-50% - 10px), 0) rotate(-1deg); }
+  75% { transform: translate3d(-4px, calc(-50% - 4px), 0) rotate(-0.2deg); }
+}
+
+@media (max-width: 1100px) {
+  .art {
+    height: min(26dvh, 260px);
+    max-width: 24vw;
+  }
+}
+
+@media (max-width: 900px) {
+  .stage {
+    display: none;
+  }
+}

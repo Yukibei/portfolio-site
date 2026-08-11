@@ -14,12 +14,8 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
 import * as THREE from "three";
 import LanyardEnvironment from "./lanyard/LanyardEnvironment";
-import {
-  BLANK_PIXEL,
-  CARD_GLB,
-  LANYARD_PNG,
-  createCardTextureAtlas,
-} from "./lanyard/textureAtlas";
+import { forwardCanvasMissPointer } from "./lanyard/pointerForwarding";
+import { BLANK_PIXEL, CARD_GLB, LANYARD_PNG, createCardTextureAtlas } from "./lanyard/textureAtlas";
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
@@ -35,6 +31,9 @@ extend({ MeshLineGeometry, MeshLineMaterial });
  * @property {string | null} [lanyardImage]
  * @property {number} [lanyardWidth]
  * @property {number} [cardScale]
+ * @property {number} [sceneOffsetX]
+ * @property {boolean} [active]
+ * @property {number} [replay]
  */
 
 /** @param {LanyardProps} props */
@@ -49,6 +48,9 @@ export default function Lanyard({
   lanyardImage = null,
   lanyardWidth = 1,
   cardScale = 2.25,
+  sceneOffsetX = 0,
+  active = true,
+  replay = 0,
 }) {
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== "undefined" && window.innerWidth < 768
@@ -71,16 +73,20 @@ export default function Lanyard({
   return (
     <div className="relative z-0 flex h-full w-full items-center justify-center">
       <Canvas
+        className="lanyard-canvas"
         camera={{ position: position, fov: fov }}
         dpr={[1, isMobile ? 1.5 : 2]}
+        // 离开本区时停掉渲染循环（不再吃 GPU），常驻挂载但不空转
+        frameloop={active ? "always" : "never"}
         gl={{ alpha: transparent, preserveDrawingBuffer: true }}
+        onPointerDownCapture={forwardCanvasMissPointer}
         onCreated={({ gl }) =>
           gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)
         }
       >
         <ambientLight intensity={Math.PI} />
         <Physics
-          paused={paused}
+          paused={paused || !active}
           gravity={gravity}
           timeStep={isMobile ? 1 / 30 : 1 / 60}
         >
@@ -92,6 +98,8 @@ export default function Lanyard({
             lanyardImage={lanyardImage}
             lanyardWidth={lanyardWidth}
             cardScale={cardScale}
+            sceneOffsetX={sceneOffsetX}
+            replay={replay}
           />
         </Physics>
         <LanyardEnvironment />
@@ -110,6 +118,8 @@ function Band({
   lanyardImage = null,
   lanyardWidth = 1,
   cardScale = 2.25,
+  sceneOffsetX = 0,
+  replay = 0,
 }) {
   const band = useRef(),
     fixed = useRef(),
@@ -176,6 +186,41 @@ function Band({
     }
   }, [hovered, dragged]);
 
+  useEffect(() => {
+    document.documentElement.dataset.lanyardCardActive =
+      hovered || dragged ? "true" : "false";
+    document.documentElement.dataset.lanyardCardDragging = dragged ? "true" : "false";
+    return () => {
+      delete document.documentElement.dataset.lanyardCardActive;
+      delete document.documentElement.dataset.lanyardCardDragging;
+    };
+  }, [hovered, dragged]);
+
+  // 重新进入本区时（replay 自增）把绳结与卡片重置回顶部初始位姿、清零速度，
+  // 让物理重新把它「掉」下来——复用同一画布与物理世界，不重建，故无首帧卡顿。
+  useEffect(() => {
+    if (replay === 0) return;
+    const targets = [
+      [fixed, sceneOffsetX],
+      [j1, sceneOffsetX + 0.5],
+      [j2, sceneOffsetX + 1],
+      [j3, sceneOffsetX + 1.5],
+      [card, sceneOffsetX + 2],
+    ];
+    targets.forEach(([ref, x]) => {
+      const b = ref.current;
+      if (!b) return;
+      b.setTranslation?.({ x, y: 4, z: 0 }, true);
+      b.setLinvel?.({ x: 0, y: 0, z: 0 }, true);
+      b.setAngvel?.({ x: 0, y: 0, z: 0 }, true);
+      b.setRotation?.({ x: 0, y: 0, z: 0, w: 1 }, true);
+      b.wakeUp?.();
+    });
+    // 清掉平滑缓存，避免绳子从旧位置拉一条瞬时直线
+    if (j1.current) j1.current.lerped = null;
+    if (j2.current) j2.current.lerped = null;
+  }, [replay, sceneOffsetX]);
+
   useFrame((state, rawDelta) => {
     // 钳制帧间隔：节流恢复后的大 delta 会让 lerp 跳变
     const delta = Math.min(rawDelta, 1 / 30);
@@ -226,7 +271,7 @@ function Band({
 
   return (
     <>
-      <group position={[0, 4, 0]}>
+      <group position={[sceneOffsetX, 4, 0]}>
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
         <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />

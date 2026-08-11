@@ -1,3 +1,5 @@
+import { FACTS } from "@/components/evidence/facts";
+
 export const NAV_LINKS = [
   { label: "About", href: "#about", external: false },
   { label: "Projects", href: "#projects", external: false },
@@ -7,8 +9,9 @@ export const NAV_LINKS = [
 
 export const CONTACT_MAILTO = "mailto:2747028274@qq.com";
 
+// 数字一律取自 evidence/facts.ts（与简历 PDF 同源），此处只决定挑哪三个上 Hero
 export const STATS = [
-  { value: "91.6%", label: "ReID mAP Achieved" },
-  { value: "12+", label: "Modules Shipped" },
-  { value: "6+", label: "Tech Awards Won" },
+  { value: FACTS.reidMap.value, label: FACTS.reidMap.labelEn },
+  { value: FACTS.modulesShipped.value, label: FACTS.modulesShipped.labelEn },
+  { value: FACTS.techAwards.value, label: FACTS.techAwards.labelEn },
 ];

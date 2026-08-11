@@ -13,9 +13,8 @@
     display: flex;
     flex-direction: column;
     background:
-      linear-gradient(135deg, rgba(0,166,255,0.08), transparent 26%),
-      linear-gradient(315deg, rgba(255,59,92,0.07), transparent 26%),
-      #fff;
+      linear-gradient(145deg, rgba(52,211,153,0.11), transparent 30%),
+      #f7f8f7;
     color: #101010;
     font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
   }
@@ -34,7 +33,7 @@
     right: 0;
     width: 440px;
     height: 280px;
-    background: linear-gradient(135deg, #00a6ff 0 49%, #111 49% 55%, #ff3b5c 55%);
+    background: linear-gradient(135deg, #34d399 0 52%, #111 52%);
     clip-path: polygon(24% 0, 100% 0, 100% 100%, 0 0);
   }
   .top {
@@ -45,7 +44,21 @@
     justify-content: space-between;
     padding: 88px 112px 0;
   }
-  .brand img { width: 640px; height: auto; display: block; }
+  .brand { display: flex; align-items: baseline; gap: 34px; }
+  .brand .mark {
+    font-family: "Arial Black", Arial, sans-serif;
+    font-size: 104px;
+    font-weight: 900;
+    line-height: 0.85;
+    letter-spacing: 2px;
+  }
+  .brand .meta {
+    color: #555;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 8px;
+  }
   .photo-shell {
     position: relative;
     z-index: 1;
@@ -56,7 +69,7 @@
     padding: 28px;
     border: 8px solid #111;
     background: #fff;
-    box-shadow: 38px 38px 0 rgba(0, 166, 255, 0.12), -38px -38px 0 rgba(255, 59, 92, 0.1);
+    box-shadow: 38px 38px 0 rgba(52, 211, 153, 0.16), -38px -38px 0 rgba(17, 17, 17, 0.08);
   }
   .photo-shell::before,
   .photo-shell::after {
@@ -113,8 +126,7 @@
     font-weight: 800;
     letter-spacing: 7px;
   }
-  .role i { width: 28px; height: 28px; background: #00a6ff; display: block; }
-  .role i:last-child { background: #ff3b5c; }
+  .role i { width: 28px; height: 28px; background: #34d399; display: block; }
   .info {
     position: relative;
     z-index: 1;
@@ -180,7 +192,10 @@
 <body>
   <div class="accent"></div>
   <div class="top">
-    <div class="brand"><img src="bytedance.svg" alt="ByteDance"></div>
+    <div class="brand">
+      <span class="mark">YL.</span>
+      <span class="meta">PORTFOLIO ID</span>
+    </div>
   </div>
 
   <div class="photo-shell">
@@ -190,19 +205,19 @@
   <section class="identity">
     <div class="cn">李怡霖</div>
     <div class="en">YILING LI</div>
-    <div class="role"><i></i>AI 应用开发实习生<i></i></div>
+    <div class="role"><i></i>AI 应用与全栈开发<i></i></div>
   </section>
 
   <section class="info">
-    <div class="item"><div class="k">部门 DEPT.</div><div class="v">AI PLATFORM</div></div>
-    <div class="item"><div class="k">工号 ID NO.</div><div class="v">BD-2026-0916</div></div>
-    <div class="item"><div class="k">办公地点 BASE</div><div class="v">BEIJING</div></div>
-    <div class="item"><div class="k">有效期 VALID</div><div class="v">2026.06 - 2027.06</div></div>
+    <div class="item"><div class="k">方向 FOCUS</div><div class="v">AI APPLICATIONS</div></div>
+    <div class="item"><div class="k">身份 PROFILE</div><div class="v">PORTFOLIO</div></div>
+    <div class="item"><div class="k">技术 BUILD</div><div class="v">FULL-STACK</div></div>
+    <div class="item"><div class="k">状态 STATUS</div><div class="v">OPEN TO WORK</div></div>
   </section>
 
   <footer class="bottom">
-    <div class="badge">员工工作证<em>EMPLOYEE BADGE</em></div>
-    <div class="code">BD&lt;&lt;2026</div>
+    <div class="badge">个人作品集<em>PORTFOLIO PASS</em></div>
+    <div class="code">YL&lt;&lt;FULLSTACK</div>
   </footer>
 </body>
 </html>

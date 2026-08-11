@@ -16,7 +16,7 @@ const Lanyard = dynamic(preloadLanyard, {
 // photos 为实习现场照片（public/experience/），当前为占位图，真实照片到位后同名替换
 const EXPERIENCES = [
   {
-    period: "2025.05 — 2025.08",
+    period: "2026.04 — 2026.06",
     company: "iFLYTEK 讯飞教育 BG",
     role: "AI 应用开发实习生 · 智学云 AI Agent 学习平台",
     points: [
@@ -30,26 +30,56 @@ const EXPERIENCES = [
     ],
   },
   {
-    period: "2025.09 — 2026.01",
-    company: "交控科技 TCT",
-    role: "软件工程师（外包项目制） · 城轨综合决策平台",
+    period: "2026.06 — 2026.08",
+    company: "东联智通",
+    role: "AI Agent 全栈应用工程师 · AIPPT / Word / CAD",
     points: [
-      "独立编写系统需求说明书、技术规格书、接口文档及 10 个业务场景文档",
-      "参与 Spring Cloud 微服务架构设计：服务拆分、实例库设计与并发容量规划",
-      "Redis / Kafka / ClickHouse 选型与容量估算，支撑线网级实时数据接入",
+      "参与 AIPPT 商业化平台研发，打通账号、免费生成、在线预览、下载扣积分、作品及订单售后主链路",
+      "设计若依任务创建、AI 引擎异步执行、回调与作品聚合链路，统一多类 AI 任务的幂等和失败状态",
+      "开发 DocPilot Word 编辑 Agent 与 CAD 语义审查工作台，将模型规划与确定性执行链路结合",
     ],
-    photos: [
-      { src: "/experience/tct-1.png", cap: "交控项目室" },
-      { src: "/experience/tct-2.png", cap: "联调现场" },
-    ],
+    photos: [],
   },
 ];
 
 export default function Experience() {
   const sectionRef = useRef<HTMLElement>(null);
-  // 滚到实习经历区时工卡从顶部掉落；离开后卸载，下次进入重新掉落
+  // 滚到实习经历区时工卡从顶部掉落
   const inView = useInView(sectionRef, { amount: 0.25 });
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  // 工作证常驻挂载：首次进入挂载一次永不卸载（避免每次重建 WebGL+物理世界导致首帧卡顿）；
+  // active 控制可见性与画布渲染开关，replay 每次重新进入自增以「重新触发掉落」而非重建。
+  const [mounted, setMounted] = useState(false);
+  const [active, setActive] = useState(false);
+  const [replay, setReplay] = useState(0);
+  const everEntered = useRef(false);
+  const canRender3D = useRef(false);
+
+  useEffect(() => {
+    // 工作证仅桌面端渲染（CSS 隐藏移动端，这里再挡住挂载，避免移动端创建画布）
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(min-width: 1024px)").matches
+    ) {
+      canRender3D.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!canRender3D.current) return;
+    if (inView) {
+      if (everEntered.current) {
+        setReplay((r) => r + 1); // 再次进入：仅重新触发掉落，画布物理不重建
+      } else {
+        everEntered.current = true;
+        setMounted(true); // 首次进入：挂载一次，之后常驻
+      }
+      setActive(true);
+    } else {
+      setActive(false);
+    }
+  }, [inView]);
 
   useEffect(() => {
     const preload = () => {
@@ -87,25 +117,28 @@ export default function Experience() {
       id="experience"
       className="relative scroll-mt-24 px-6 py-20 sm:px-10 lg:px-16 lg:py-28"
     >
-      <SectionTitle index="03" en="Experience." zh="实习经历" />
+      <SectionTitle index="01" en="Experience." zh="实习经历" />
 
-      <div className="space-y-0 border-t border-white/10 lg:max-w-[66%]">
+      <div className="experience-list space-y-0 border-t border-white/10">
         {EXPERIENCES.map((exp, i) => {
-          const open = openIdx === i;
+          const hasPhotos = exp.photos.length > 0;
+          const open = hasPhotos && openIdx === i;
           return (
             <Reveal key={exp.company} delay={i * 0.08}>
               <div
-                role="button"
-                tabIndex={0}
-                aria-expanded={open}
-                onClick={() => setOpenIdx(open ? null : i)}
+                role={hasPhotos ? "button" : undefined}
+                tabIndex={hasPhotos ? 0 : undefined}
+                aria-expanded={hasPhotos ? open : undefined}
+                onClick={() => hasPhotos && setOpenIdx(open ? null : i)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+                  if (hasPhotos && (e.key === "Enter" || e.key === " ")) {
                     e.preventDefault();
                     setOpenIdx(open ? null : i);
                   }
                 }}
-                className="group cursor-pointer border-b border-white/10 py-10 outline-none"
+                className={`group border-b border-white/10 py-10 outline-none ${
+                  hasPhotos ? "cursor-pointer" : ""
+                }`}
               >
                 <div className="grid gap-4 lg:grid-cols-[220px_1fr] lg:gap-12">
                   <div className="font-inter text-sm tracking-widest text-white/40">
@@ -116,20 +149,22 @@ export default function Experience() {
                       <h3 className="font-inter text-xl font-bold text-white sm:text-2xl">
                         {exp.company}
                       </h3>
-                      <span
-                        className={`flex shrink-0 items-center gap-2 font-inter text-[10px] uppercase tracking-[0.25em] transition-colors ${
-                          open
-                            ? "text-white"
-                            : "text-white/35 group-hover:text-white/70"
-                        }`}
-                      >
-                        Photos · 现场
-                        <Plus
-                          className={`h-3.5 w-3.5 transition-transform duration-300 ${
-                            open ? "rotate-45" : ""
+                      {hasPhotos ? (
+                        <span
+                          className={`flex shrink-0 items-center gap-2 font-inter text-[10px] uppercase tracking-[0.25em] transition-colors ${
+                            open
+                              ? "text-white"
+                              : "text-white/35 group-hover:text-white/70"
                           }`}
-                        />
-                      </span>
+                        >
+                          Photos · 现场
+                          <Plus
+                            className={`h-3.5 w-3.5 transition-transform duration-300 ${
+                              open ? "rotate-45" : ""
+                            }`}
+                          />
+                        </span>
+                      ) : null}
                     </div>
                     <p className="mt-1 font-inter text-sm tracking-wider text-white/50">
                       {exp.role}
@@ -196,39 +231,35 @@ export default function Experience() {
         })}
       </div>
 
-      {/* 3D 工作证：滚入本区时从页面顶部（header 后方）垂落，可拖拽甩动；
-          离开时整体向上抽回（exit 动画），不做生硬消失。
-          fixed 定位让挂绳真正从视口顶端垂下；z-30 低于 navbar(z-40)。
-          桌面端专属（移动端性能与空间不适合物理画布）。 */}
-      <AnimatePresence>
-        {inView && (
-          <motion.div
-            key="lanyard-badge"
-            className="pointer-events-none fixed bottom-8 right-10 top-12 z-30 hidden w-[40vw] min-w-[430px] max-w-[620px] lg:block"
-            initial={{ opacity: 0 }}
-            animate={{ y: 0, opacity: 1, transition: { duration: 0.3 } }}
-            exit={{
-              y: "-105%",
-              transition: { duration: 0.65, ease: [0.55, 0, 0.85, 0.36] },
-            }}
-            aria-hidden="true"
-          >
-            <div className="pointer-events-auto h-full w-full">
-              <Lanyard
-                key="experience-lanyard-react-bits"
-                position={[0, 0, 20]}
-                gravity={[0, -40, 0]}
-                fov={20}
-                cardScale={2.95}
-                frontImage="/lanyard/front.png"
-                backImage="/lanyard/back.png"
-                lanyardImage="/lanyard/band.png"
-                lanyardWidth={1.05}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* 3D 工作证：首次滚入本区时挂载一次并从顶部垂落，可拖拽甩动；
+          离开时画布暂停渲染并向上淡出抽回（CSS 过渡），不卸载、不重建；
+          再次进入只重置刚体到顶部重新掉落（replay 自增），消除重建首帧卡顿。
+          fixed 定位让挂绳真正从视口顶端垂下；z-50。桌面端专属。 */}
+      {mounted && (
+        <div
+          className="experience-lanyard pointer-events-none fixed inset-0 z-50"
+          data-active={active ? "true" : "false"}
+          aria-hidden="true"
+        >
+          <div className="experience-lanyard-safe-zone" />
+          <div className="experience-lanyard-frame pointer-events-auto h-full">
+            <Lanyard
+              key="experience-lanyard-react-bits"
+              active={active}
+              replay={replay}
+              position={[0, 0, 20]}
+              gravity={[0, -40, 0]}
+              fov={20}
+              sceneOffsetX={4.0}
+              cardScale={2.95}
+              frontImage="/lanyard/front.png"
+              backImage="/lanyard/back.png"
+              lanyardImage="/lanyard/band.png"
+              lanyardWidth={0.72}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }

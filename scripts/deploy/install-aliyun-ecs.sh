@@ -69,11 +69,44 @@ if [ ! -x "$RELEASE_DIR/start.sh" ] || \
   exit 1
 fi
 
+SERVICE_FILE="/etc/systemd/system/$APP_NAME.service"
+SERVICE_BACKUP=""
+if [ -f "$SERVICE_FILE" ]; then
+  SERVICE_BACKUP="$(mktemp)"
+  cp "$SERVICE_FILE" "$SERVICE_BACKUP"
+fi
+
+restore_service_definition() {
+  if [ -n "$SERVICE_BACKUP" ]; then
+    cp "$SERVICE_BACKUP" "$SERVICE_FILE"
+    rm -f "$SERVICE_BACKUP"
+    SERVICE_BACKUP=""
+  else
+    rm -f "$SERVICE_FILE"
+  fi
+  systemctl daemon-reload || true
+}
+
+rollback_release() {
+  if [ -n "$PREVIOUS_RELEASE" ] && [ -d "$PREVIOUS_RELEASE" ]; then
+    ln -sfn "$PREVIOUS_RELEASE" "$APP_ROOT/current"
+    restore_service_definition
+    systemctl restart "$APP_NAME" || true
+    echo "Rolled back to $PREVIOUS_RELEASE" >&2
+  else
+    systemctl stop "$APP_NAME" || true
+    rm -f "$APP_ROOT/current"
+    restore_service_definition
+    echo "First deployment failed; service stopped." >&2
+  fi
+  rm -rf -- "$RELEASE_DIR"
+}
+
 ln -sfn "$RELEASE_DIR" "$APP_ROOT/current"
 chown "$APP_USER":"$APP_USER" "$APP_ROOT" "$APP_ROOT/releases" "$APP_ROOT/shared"
 chown -R "$APP_USER":"$APP_USER" "$RELEASE_DIR"
 
-cat > "/etc/systemd/system/$APP_NAME.service" <<SERVICE
+cat > "$SERVICE_FILE" <<SERVICE
 [Unit]
 Description=Portfolio Site
 After=network.target
@@ -93,29 +126,20 @@ RestartSec=5
 WantedBy=multi-user.target
 SERVICE
 
-systemctl daemon-reload
-systemctl enable "$APP_NAME"
-
-rollback_release() {
-  if [ -n "$PREVIOUS_RELEASE" ] && [ -d "$PREVIOUS_RELEASE" ]; then
-    ln -sfn "$PREVIOUS_RELEASE" "$APP_ROOT/current"
-    systemctl restart "$APP_NAME" || true
-    echo "Rolled back to $PREVIOUS_RELEASE" >&2
-  else
-    rm -f "$APP_ROOT/current"
-    systemctl stop "$APP_NAME" || true
-    echo "First deployment failed; service stopped." >&2
-  fi
-}
-
-if ! systemctl restart "$APP_NAME"; then
+if ! systemctl daemon-reload ||
+  ! systemctl enable "$APP_NAME" ||
+  ! systemctl restart "$APP_NAME"; then
   rollback_release
   exit 1
 fi
 
 APP_READY=false
+HEALTH_HOST="$BIND_HOST"
+if [ "$HEALTH_HOST" = "0.0.0.0" ]; then
+  HEALTH_HOST="127.0.0.1"
+fi
 for _ in $(seq 1 30); do
-  if curl --max-time 2 -fsS "http://127.0.0.1:$PORT/" >/dev/null; then
+  if curl --max-time 2 -fsS "http://$HEALTH_HOST:$PORT/" >/dev/null; then
     APP_READY=true
     break
   fi
@@ -135,6 +159,26 @@ if command -v nginx >/dev/null 2>&1; then
     NGINX_BACKUP="$(mktemp)"
     cp "$NGINX_CONFIG" "$NGINX_BACKUP"
   fi
+  restore_nginx_config() {
+    if [ -n "$NGINX_BACKUP" ]; then
+      cp "$NGINX_BACKUP" "$NGINX_CONFIG"
+      rm -f "$NGINX_BACKUP"
+      NGINX_BACKUP=""
+    else
+      rm -f "$NGINX_CONFIG"
+    fi
+  }
+  rollback_nginx_and_release() {
+    restore_nginx_config
+    if nginx -t; then
+      if systemctl is-active --quiet nginx; then
+        systemctl reload nginx || true
+      else
+        systemctl start nginx || true
+      fi
+    fi
+    rollback_release
+  }
   DOMAIN_NAMES="$(normalize_domains)"
   primary_domain="${DOMAIN_NAMES%% *}"
   cert_dir="/etc/letsencrypt/live/$primary_domain"
@@ -187,22 +231,24 @@ server {
 NGINX
   fi
   if ! nginx -t; then
-    if [ -n "$NGINX_BACKUP" ]; then
-      cp "$NGINX_BACKUP" "$NGINX_CONFIG"
-    else
-      rm -f "$NGINX_CONFIG"
-    fi
-    rm -f "$NGINX_BACKUP"
-    nginx -t || true
+    rollback_nginx_and_release
     exit 1
   fi
-  rm -f "$NGINX_BACKUP"
-  systemctl enable nginx
-  systemctl start nginx
-  systemctl reload nginx
+  if ! systemctl enable nginx ||
+    ! systemctl start nginx ||
+    ! systemctl reload nginx; then
+    rollback_nginx_and_release
+    exit 1
+  fi
+  if [ -n "$NGINX_BACKUP" ]; then
+    rm -f "$NGINX_BACKUP"
+  fi
 else
   echo "nginx not found; skipped reverse proxy configuration."
 fi
 
+if [ -n "$SERVICE_BACKUP" ]; then
+  rm -f "$SERVICE_BACKUP"
+fi
 systemctl --no-pager --full status "$APP_NAME" || true
 echo "Installed $APP_NAME at $APP_ROOT/current"

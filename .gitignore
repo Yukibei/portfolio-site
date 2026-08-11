@@ -1,8 +1,18 @@
 /.omx/
 /.playwright-mcp/
+/.playwright-cli/
+/.superpowers/
+/.serena/
+/.spec-workflow/
 /logs/
+/output/
+/图片/
 /*.png
+/experience-debug-before.json
 
+discuss/verify/
+
+web/.serena/
 web/node_modules/
 web/.next/
 web/out/

@@ -1,7 +1,7 @@
 import { getWorkProject } from "@/content/work";
 import type { DesktopProject } from "../data";
+import AppDetails from "./AppDetails";
 import NoteDetails from "./NoteDetails";
-import WorkDetails from "./WorkDetails";
 
 type ProjectDetailsProps = {
   project: DesktopProject;
@@ -11,6 +11,19 @@ export default function ProjectDetails({ project }: ProjectDetailsProps) {
   if (project.kind === "note") {
     return (
       <NoteDetails label={project.label} thumbnail={project.thumbnail} note={project.note} />
+    );
+  }
+
+  if (project.kind === "service") {
+    return (
+      <AppDetails
+        title={project.service.name}
+        subtitle={project.service.label}
+        summary={project.service.description}
+        thumbnail={project.thumbnail}
+        thumbnailAspectRatio={project.thumbnailAspectRatio}
+        href={project.service.href}
+      />
     );
   }
 
@@ -24,5 +37,14 @@ export default function ProjectDetails({ project }: ProjectDetailsProps) {
     );
   }
 
-  return <WorkDetails project={work} />;
+  return (
+    <AppDetails
+      title={work.title}
+      subtitle={work.zhTitle}
+      summary={work.summary}
+      thumbnail={project.thumbnail}
+      thumbnailAspectRatio={project.thumbnailAspectRatio}
+      href={work.links.at(0)?.href}
+    />
+  );
 }

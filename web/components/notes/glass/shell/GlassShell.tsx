@@ -43,6 +43,7 @@ type GlassShellProps = {
   main: ReactNode;
   sideLayout?: SlotLayout;
   mainLayout?: SlotLayout;
+  searchQuery?: string;
   /** 提醒中心有未读时点亮铃铛绿点 */
   hasUnread?: boolean;
 };
@@ -55,6 +56,7 @@ export default function GlassShell({
   main,
   sideLayout = "split",
   mainLayout = "split",
+  searchQuery = "",
   hasUnread = false,
 }: GlassShellProps) {
   return (
@@ -96,7 +98,7 @@ export default function GlassShell({
 
         <section className={styles.window}>
           <header className={chrome.winhead}>
-            <SearchBox />
+            <SearchBox initialValue={searchQuery} />
 
             <div className={chrome.headRight}>
               {headCenter}

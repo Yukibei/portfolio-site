@@ -1,3 +1,24 @@
+.hero-stats {
+  margin-top: auto;
+}
+
+@media (min-width: 768px) {
+  .hero-stats {
+    margin-bottom: 3rem;
+  }
+}
+
+@media (min-width: 768px) and (min-height: 901px) {
+  .hero-actions {
+    margin-top: 3.25rem;
+  }
+
+  .hero-stats {
+    margin-top: 3.75rem;
+    margin-bottom: 0;
+  }
+}
+
 @media (min-width: 768px) and (max-height: 900px) {
   .hero-layout {
     padding-bottom: 1.25rem;
@@ -27,6 +48,7 @@
   }
 
   .hero-stats {
+    margin-bottom: 1.5rem;
     padding-top: 1rem;
   }
 }

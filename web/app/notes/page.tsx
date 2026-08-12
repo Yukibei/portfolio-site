@@ -62,6 +62,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
       allNotes={allNotes}
       projectRecos={WORK_PROJECTS.map(projectToReco)}
       activeCategory={category}
+      searchQuery={query}
       heroIndex={heroIndex}
     />
   );

@@ -17,6 +17,10 @@ type OpenWindow =
 export default function DesktopPortfolio() {
   const [openWindow, setOpenWindow] = useState<OpenWindow | null>(null);
 
+  const openProject = (project: DesktopProject) => {
+    setOpenWindow({ kind: "project", project });
+  };
+
   return (
     <section aria-label="个人桌面作品集" style={{ position: "relative", width: "100%", height: "100vh", minHeight: 640, overflow: "hidden", background: "white", fontFamily: "Inter, sans-serif" }}>
       <DesktopWallpaper />
@@ -24,7 +28,7 @@ export default function DesktopPortfolio() {
       <div aria-hidden style={{ position: "absolute", bottom: 0, left: "50%", zIndex: 1, width: "100%", height: "47.375%", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", maskImage: "linear-gradient(to bottom, transparent 0%, black 40%)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 40%)", pointerEvents: "none", transform: "translateX(-50%)" }} />
 
       {projects.map((project) => (
-        <ProjectCard key={project.label} project={project} onOpen={(selected) => setOpenWindow({ kind: "project", project: selected })} />
+        <ProjectCard key={project.label} project={project} onOpen={openProject} />
       ))}
 
       <Dock onOpenWindow={(kind) => setOpenWindow({ kind })} />

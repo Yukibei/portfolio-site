@@ -1,17 +1,23 @@
 "use client";
 
 import { useEffect } from "react";
-import { writeProgress } from "./readingProgress";
+import {
+  isInProgress,
+  progressStore,
+  writeProgress,
+} from "./readingProgress";
 
 type ReadingTrackerProps = {
   slug: string;
+  resume?: boolean;
 };
 
 /** 挂在文章页，把整页滚动位置持续写入 localStorage，供「继续阅读」读取 */
-export default function ReadingTracker({ slug }: ReadingTrackerProps) {
+export default function ReadingTracker({ slug, resume = false }: ReadingTrackerProps) {
   useEffect(() => {
     let ticking = false;
     let lastWrite = 0;
+    let restoreFrame = 0;
 
     const computePercent = () => {
       const scrollable = document.documentElement.scrollHeight - window.innerHeight;
@@ -35,14 +41,23 @@ export default function ReadingTracker({ slug }: ReadingTrackerProps) {
       });
     };
 
-    flush(true);
+    const saved = resume ? progressStore.read()[slug] : undefined;
+    if (isInProgress(saved)) {
+      restoreFrame = requestAnimationFrame(() => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        window.scrollTo(0, scrollable * (saved.percent / 100));
+      });
+    } else {
+      flush(true);
+    }
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
+      cancelAnimationFrame(restoreFrame);
       window.removeEventListener("scroll", onScroll);
       flush(true);
     };
-  }, [slug]);
+  }, [resume, slug]);
 
   return null;
 }

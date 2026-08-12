@@ -6,16 +6,17 @@ import styles from "./NoteRow.module.css";
 
 type NoteRowProps = {
   note: NoteMeta;
+  href?: string;
   /** 副行；缺省显示「日期 · 阅读时长」 */
   sub?: ReactNode;
   /** 行尾插槽：书签按钮、百分比等 */
   trailing?: ReactNode;
 };
 
-export default function NoteRow({ note, sub, trailing }: NoteRowProps) {
+export default function NoteRow({ note, href, sub, trailing }: NoteRowProps) {
   return (
     <div className={styles.rowWrap}>
-      <Link href={`/notes/${note.slug}`} className={styles.row}>
+      <Link href={href ?? `/notes/${note.slug}`} className={styles.row}>
         <span className={styles.cover} style={coverArtStyle(note.slug, note.cover)} aria-hidden />
         <span className={styles.text}>
           <span className={styles.title}>{note.title}</span>

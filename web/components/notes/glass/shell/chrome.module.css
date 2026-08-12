@@ -97,6 +97,8 @@
 
 .search input { width: 9rem; border: 0; outline: 0; background: transparent; color: #fff; font: inherit; font-size: var(--t-sm); }
 .search input::placeholder { color: inherit; }
+.searchButton { display: grid; flex: none; place-items: center; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; }
+.searchButton:hover { color: #fff; }
 
 .headRight {
   display: flex;

@@ -68,7 +68,9 @@ await page.waitForURL(/query=CAD/);
 await page.getByText("CAD 语义审查：每一个结论都要能回到证据").first().waitFor();
 
 await open("/notes/settings");
+page.once("dialog", (dialog) => dialog.accept());
 await page.getByRole("button", { name: "清除全部数据" }).click();
+await page.getByRole("status").getByText("已清除收藏、稍后读、阅读进度和阅读偏好").waitFor();
 await open("/notes/favorites");
 await page.getByText("收藏列表还是空的").waitFor();
 

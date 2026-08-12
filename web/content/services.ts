@@ -7,6 +7,14 @@ export type ServiceEntry = {
   caseHref?: string;
 };
 
+export const MODEL_GATEWAY_SERVICE = {
+  name: "Model Gateway",
+  label: "api.liyilin.xyz",
+  description: "统一管理模型访问、API Routing 与上游服务切换的个人 AI 基础设施。",
+  status: "Live",
+  href: "https://api.liyilin.xyz/",
+} satisfies ServiceEntry;
+
 export const SERVICES: ServiceEntry[] = [
   {
     name: "Personal Portfolio",
@@ -15,15 +23,9 @@ export const SERVICES: ServiceEntry[] = [
     status: "Live",
     href: "https://www.liyilin.xyz",
   },
+  MODEL_GATEWAY_SERVICE,
   {
-    name: "Model Gateway",
-    label: "api.liyilin.xyz",
-    description: "模型网关与 API Routing 基础设施。公开入口不展示密钥、余额和内部调用日志。",
-    status: "Live",
-    href: "https://api.liyilin.xyz",
-  },
-  {
-    name: "AI PPT Platform",
+    name: "MedSlide Agent",
     label: "AI generation service",
     description: "AI PPT 商业化主链可联调，独立服务器承载生成任务。",
     status: "Private preview",

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   motion,
+  useInView,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
@@ -49,6 +50,7 @@ export default function DesktopTransition() {
   const desktopInteractiveRef = useRef(false);
   const navImmersiveRef = useRef(false);
   const reduceMotion = useReducedMotion();
+  const sceneReady = useInView(sectionRef, { once: true, amount: "some" });
   const [desktopInteractive, setDesktopInteractive] = useState(false);
   const [metrics, setMetrics] = useState(DEFAULT_METRICS);
   const { scrollYProgress } = useScroll({
@@ -229,17 +231,25 @@ export default function DesktopTransition() {
     return () => trigger.kill();
   }, [reduceMotion]);
 
-  if (reduceMotion) return <DesktopPortfolio />;
+  if (reduceMotion) {
+    return (
+      <section ref={sectionRef} className="min-h-screen bg-[#050505]">
+        {sceneReady ? <DesktopPortfolio /> : null}
+      </section>
+    );
+  }
 
   return (
     <section ref={sectionRef} aria-label="进入个人桌面" style={{ position: "relative", height: "500vh", background: "#050505" }}>
       <div style={{ position: "sticky", top: 0, width: "100%", height: "100dvh", minHeight: 620, overflow: "hidden", background: "#050505" }}>
         <motion.div aria-hidden style={{ position: "absolute", inset: 0, opacity: ambientOpacity, background: "radial-gradient(ellipse at 50% 63%, rgba(210,218,232,.16) 0%, rgba(66,74,90,.08) 24%, transparent 52%), linear-gradient(180deg, #050505 0%, #08090b 100%)", pointerEvents: "none" }} />
 
-        <SideMascots
-          closingOpacity={closingMascotOpacity}
-          openingOpacity={openingMascotOpacity}
-        />
+        {sceneReady ? (
+          <>
+            <SideMascots
+              closingOpacity={closingMascotOpacity}
+              openingOpacity={openingMascotOpacity}
+            />
 
         <motion.div style={{ position: "absolute", inset: 0, zIndex: 3, display: "flex", alignItems: "center", justifyContent: "center", opacity: laptopOpacity, scale: sceneScale, perspective: 1200, transformStyle: "preserve-3d", willChange: "transform, opacity" }}>
           <LaptopModel
@@ -262,9 +272,11 @@ export default function DesktopTransition() {
           />
         </motion.div>
 
-        <motion.div style={{ position: "absolute", inset: 0, zIndex: 5, overflow: "hidden", borderRadius: desktopRadius, opacity: desktopOpacity, y: desktopY, scaleX: desktopScaleX, scaleY: desktopScaleY, pointerEvents: desktopInteractive ? "auto" : "none", transformOrigin: "50% 50%", willChange: "transform, opacity" }}>
-          <DesktopPortfolio />
-        </motion.div>
+            <motion.div style={{ position: "absolute", inset: 0, zIndex: 5, overflow: "hidden", borderRadius: desktopRadius, opacity: desktopOpacity, y: desktopY, scaleX: desktopScaleX, scaleY: desktopScaleY, pointerEvents: desktopInteractive ? "auto" : "none", transformOrigin: "50% 50%", willChange: "transform, opacity" }}>
+              <DesktopPortfolio />
+            </motion.div>
+          </>
+        ) : null}
       </div>
     </section>
   );

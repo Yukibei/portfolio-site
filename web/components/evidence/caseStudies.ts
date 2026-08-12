@@ -62,8 +62,8 @@ export const CASE_STUDIES: CaseStudy[] = [
       "篮球持球人重识别（ReID）平台 — 从算法服务化到前后端交付的完整闭环。",
     metricsLine: `mAP ${FACTS.reidMap.value} · Rank-1 ${FACTS.reidRank1.value} · ${FACTS.modulesShipped.value} 业务模块`,
     stackLine: "Vue 3 · Spring Boot · FastAPI · PyTorch · MySQL · Redis",
-    href: null,
-    linkLabel: "案例可验证",
+    href: "https://hooppupil.me/",
+    linkLabel: "访问 Hoop Pupil",
     images: {
       a: "/projects/hp-a.png",
       b: "/projects/hp-b.png",
@@ -144,8 +144,8 @@ export const CASE_STUDIES: CaseStudy[] = [
       "基于 LangGraph 的多智能体个性化学习系统 — 规划、生成、评价与反思记忆的闭环，SSE 流式输出。",
     metricsLine: "多智能体编排 · 向量召回 · 知识图谱",
     stackLine: "Python · LangGraph · LiteLLM · Qdrant · Neo4j · PostgreSQL",
-    href: null,
-    linkLabel: "案例可验证",
+    href: "https://learn.liyilin.xyz/",
+    linkLabel: "访问 ReflexLearn",
     images: {
       a: "/projects/rl-a.png",
       b: "/projects/rl-b.png",

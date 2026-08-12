@@ -1,4 +1,5 @@
 import { createMapStore } from "./localStore";
+import { queueStore } from "./bookmarks";
 
 export type ProgressEntry = {
   percent: number;
@@ -23,6 +24,7 @@ export const progressStore = createMapStore<ProgressEntry>(
 export function writeProgress(slug: string, percent: number): void {
   const clamped = Math.min(100, Math.max(0, Math.round(percent)));
   progressStore.set(slug, { percent: clamped, updatedAt: Date.now() });
+  if (clamped > DONE_PERCENT) queueStore.remove(slug);
 }
 
 export function isInProgress(entry: ProgressEntry | undefined): entry is ProgressEntry {

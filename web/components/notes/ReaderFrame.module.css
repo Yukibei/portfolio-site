@@ -1,0 +1,19 @@
+.root {
+  --note-body-size: 15px;
+  --note-body-leading: 2rem;
+}
+
+.root[data-text-scale="compact"] {
+  --note-body-size: 14px;
+  --note-body-leading: 1.8rem;
+}
+
+.root[data-text-scale="large"] {
+  --note-body-size: 17px;
+  --note-body-leading: 2.2rem;
+}
+
+.root :global(.note-copy) {
+  font-size: var(--note-body-size);
+  line-height: var(--note-body-leading);
+}

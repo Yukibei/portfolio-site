@@ -21,6 +21,7 @@ type DashboardProps = {
   /** 文章不足时补进推荐位的项目卡 */
   projectRecos: RecoItem[];
   activeCategory: NoteCategory | null;
+  searchQuery: string;
   /** hero 展示第几篇，由 ?hero= 驱动，箭头真实翻页 */
   heroIndex: number;
 };
@@ -49,11 +50,15 @@ export default function Dashboard({
   allNotes,
   projectRecos,
   activeCategory,
+  searchQuery,
   heroIndex,
 }: DashboardProps) {
   const hero = notes.at(heroIndex);
   const rest = notes.filter((_, index) => index !== heroIndex);
-  const recos = [...rest.map(noteToReco), ...projectRecos].slice(0, RECO_LIMIT);
+  const recos = [
+    ...rest.map(noteToReco),
+    ...(searchQuery ? [] : projectRecos),
+  ].slice(0, RECO_LIMIT);
 
   const hasPrev = heroIndex > 0;
   const hasNext = heroIndex < notes.length - 1;
@@ -62,10 +67,14 @@ export default function Dashboard({
     <GlassShell
       active="home"
       path="/notes"
+      searchQuery={searchQuery}
       headCenter={<CategoryTabs active={activeCategory} />}
       side={
         <>
-          <Panel title="最新发布" hint="按发布时间">
+          <Panel
+            title={searchQuery ? `搜索：${searchQuery}` : "最新发布"}
+            hint={searchQuery ? `${notes.length} 篇匹配` : "按发布时间"}
+          >
             {notes.length === 0 ? (
               <PanelEmpty>这个分类还没有文章。</PanelEmpty>
             ) : (
@@ -139,11 +148,14 @@ export default function Dashboard({
               }
             />
           ) : (
-            <Hero title="这个分类还没有文章" desc="换一个分类，或回到全部笔记看看。" />
+            <Hero
+              title={searchQuery ? `没有找到“${searchQuery}”` : "这个分类还没有文章"}
+              desc={searchQuery ? "换一个关键词，或清除搜索查看全部笔记。" : "换一个分类，或回到全部笔记看看。"}
+            />
           )}
 
           <CardStrip
-            title="你可能想读"
+            title={searchQuery ? `更多匹配 · ${Math.max(0, notes.length - 1)}` : "你可能想读"}
             action={
               activeCategory !== null ? (
                 <Link href="/notes" className={cardStyles.seeAll}>

@@ -170,13 +170,13 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <div className="hero-stats animate-fade-up-delay-4 mt-auto flex shrink-0 flex-wrap gap-6 pt-6 sm:gap-12 lg:gap-16">
+        <div className="hero-stats animate-fade-up-delay-4 flex shrink-0 flex-wrap gap-8 pt-6 sm:gap-14 lg:gap-20">
           {STATS.map((stat) => (
             <div key={stat.label}>
-              <div className="font-inter text-2xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+              <div className="font-inter text-3xl font-bold tracking-tight text-white sm:text-5xl lg:text-[3.5rem]">
                 {stat.value}
               </div>
-              <div className="mt-1 font-inter text-[9px] uppercase tracking-widest text-white/50 sm:text-xs">
+              <div className="mt-1.5 font-inter text-[10px] uppercase tracking-widest text-white/55 sm:text-[13px]">
                 {stat.label}
               </div>
             </div>

@@ -4,12 +4,10 @@ import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import SkillsHonors from "@/components/SkillsHonors";
 import HeroSection from "./home/HeroSection";
-import LoadingGate from "@/components/common/LoadingGate";
 
 export default function Home() {
   return (
     <>
-      <LoadingGate />
       <main id="main-content">
         <HeroSection />
 

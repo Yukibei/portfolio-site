@@ -37,6 +37,7 @@ export default function ContinueReading({ notes }: { notes: NoteMeta[] }) {
             <NoteRow
               key={note.slug}
               note={note}
+              href={`/notes/${note.slug}?resume=1`}
               sub={<ProgressBar percent={entry.percent} />}
               trailing={<RowPercent percent={entry.percent} />}
             />

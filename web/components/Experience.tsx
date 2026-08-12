@@ -7,8 +7,7 @@ import { Plus } from "lucide-react";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import Reveal, { SectionTitle } from "./Reveal";
 
-const preloadLanyard = () => import("./Lanyard");
-const Lanyard = dynamic(preloadLanyard, {
+const Lanyard = dynamic(() => import("./Lanyard"), {
   ssr: false,
   loading: () => <BadgeFallback />,
 });
@@ -80,36 +79,6 @@ export default function Experience() {
       setActive(false);
     }
   }, [inView]);
-
-  useEffect(() => {
-    const preload = () => {
-      void preloadLanyard();
-      ["/lanyard/card.glb", "/lanyard/front.png", "/lanyard/back.png"].forEach(
-        (href) => {
-          const link = document.createElement("link");
-          link.rel = "prefetch";
-          link.as = href.endsWith(".glb") ? "fetch" : "image";
-          link.href = href;
-          if (href.endsWith(".glb")) link.crossOrigin = "anonymous";
-          document.head.appendChild(link);
-        }
-      );
-    };
-    const win = window as Window &
-      typeof globalThis & {
-        requestIdleCallback?: (
-          callback: IdleRequestCallback,
-          options?: IdleRequestOptions
-        ) => number;
-        cancelIdleCallback?: (handle: number) => void;
-      };
-    if (win.requestIdleCallback && win.cancelIdleCallback) {
-      const id = win.requestIdleCallback(preload, { timeout: 2500 });
-      return () => win.cancelIdleCallback?.(id);
-    }
-    const id = globalThis.setTimeout(preload, 1200);
-    return () => globalThis.clearTimeout(id);
-  }, []);
 
   return (
     <section

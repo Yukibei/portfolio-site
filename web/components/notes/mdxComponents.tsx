@@ -34,18 +34,18 @@ export const mdxComponents = {
     <h3 className="mt-10 scroll-mt-32 font-body text-xl font-semibold text-white" {...props} />
   ),
   p: (props: Props<"p">) => (
-    <p className="mt-6 text-pretty font-body text-[15px] font-light leading-8 text-white/62" {...props} />
+    <p className="note-copy mt-6 text-pretty font-body font-light text-white/62" {...props} />
   ),
   ul: (props: Props<"ul">) => (
-    <ul className="mt-6 list-disc space-y-2 pl-5 font-body text-[15px] font-light leading-8 text-white/62 marker:text-white/30" {...props} />
+    <ul className="note-copy mt-6 list-disc space-y-2 pl-5 font-body font-light text-white/62 marker:text-white/30" {...props} />
   ),
   ol: (props: Props<"ol">) => (
-    <ol className="mt-6 list-decimal space-y-2 pl-5 font-body text-[15px] font-light leading-8 text-white/62 marker:text-white/30" {...props} />
+    <ol className="note-copy mt-6 list-decimal space-y-2 pl-5 font-body font-light text-white/62 marker:text-white/30" {...props} />
   ),
   li: (props: Props<"li">) => <li className="pl-1" {...props} />,
   blockquote: (props: Props<"blockquote">) => (
     <blockquote
-      className="mt-8 border-l-2 border-white/25 pl-5 font-body text-[15px] font-light italic leading-8 text-white/50"
+      className="note-copy mt-8 border-l-2 border-white/25 pl-5 font-body font-light italic text-white/50"
       {...props}
     />
   ),

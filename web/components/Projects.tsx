@@ -12,10 +12,8 @@ function MediaComposition({ project }: { project: WorkProject }) {
       <ProjectMedia media={primary} className="rounded-xl" />
       {secondary ? (
         <div
-          className={`liquid-glass absolute z-10 rounded-xl p-1.5 shadow-[0_24px_70px_rgba(0,0,0,0.55)] sm:p-2 ${
-            secondary.shape === "portrait"
-              ? "-bottom-8 right-4 w-[28%] sm:-bottom-10 sm:right-7"
-              : "-bottom-8 right-4 w-[48%] sm:-bottom-10 sm:right-7"
+          className={`liquid-glass absolute bottom-14 right-4 z-10 rounded-xl p-1.5 shadow-[0_24px_70px_rgba(0,0,0,0.55)] sm:bottom-16 sm:right-7 sm:p-2 ${
+            secondary.shape === "portrait" ? "w-[28%]" : "w-[48%]"
           }`}
         >
           <ProjectMedia

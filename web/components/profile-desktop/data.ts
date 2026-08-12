@@ -1,6 +1,12 @@
+import {
+  MODEL_GATEWAY_SERVICE,
+  type ServiceEntry,
+} from "@/content/services";
+
 export type DesktopIcon = {
   label: string;
   thumbnail: string;
+  thumbnailAspectRatio?: number;
   anchorX: number;
   anchorY: number;
 };
@@ -21,7 +27,8 @@ export type AuthorNote = {
 
 export type DesktopProject =
   | (DesktopIcon & { kind: "work"; slug: string })
-  | (DesktopIcon & { kind: "note"; note: AuthorNote });
+  | (DesktopIcon & { kind: "note"; note: AuthorNote })
+  | (DesktopIcon & { kind: "service"; service: ServiceEntry });
 
 export type DockItem = {
   label: string;
@@ -31,15 +38,15 @@ export type DockItem = {
   window?: "about" | "notes";
 };
 
-export const DESKTOP_BACKGROUND = "/profile-desktop/wallpaper-maid-poster.png";
-export const DESKTOP_WALLPAPER_VIDEO = "/profile-desktop/wallpaper-maid.mp4";
+export const DESKTOP_BACKGROUND = "/profile-desktop/male-hoodie-wallpaper.png";
 
 export const projects: DesktopProject[] = [
   {
     kind: "work",
     slug: "hoop-pupil",
-    label: "智瞳篮途",
-    thumbnail: "/projects/hp-b.png",
+    label: "Hoop Pupil",
+    thumbnail: "/profile-desktop/apps/hoop-pupil.png",
+    thumbnailAspectRatio: 2048 / 1153,
     anchorX: 26,
     anchorY: 29.5,
   },
@@ -47,15 +54,26 @@ export const projects: DesktopProject[] = [
     kind: "work",
     slug: "reflexlearn",
     label: "ReflexLearn",
-    thumbnail: "/projects/rl-b.png",
+    thumbnail: "/profile-desktop/apps/reflexlearn.png",
+    thumbnailAspectRatio: 2048 / 1146,
     anchorX: 42.75,
     anchorY: 48.5,
   },
   {
     kind: "work",
+    slug: "ai-ppt-platform",
+    label: "MedSlide Agent",
+    thumbnail: "/profile-desktop/apps/medslide-agent.png",
+    thumbnailAspectRatio: 2048 / 1029,
+    anchorX: 61.5,
+    anchorY: 60,
+  },
+  {
+    kind: "work",
     slug: "cad-semantic-workbench",
     label: "CAD 语义审查",
-    thumbnail: "/work/cad/delivery.png",
+    thumbnail: "/profile-desktop/apps/cad.png",
+    thumbnailAspectRatio: 2048 / 1377,
     anchorX: 66.08,
     anchorY: 19.63,
   },
@@ -63,9 +81,19 @@ export const projects: DesktopProject[] = [
     kind: "work",
     slug: "docpilot",
     label: "DocPilot",
-    thumbnail: "/work/docpilot/editor.png",
+    thumbnail: "/profile-desktop/apps/docpilot.png",
+    thumbnailAspectRatio: 2048 / 1152,
     anchorX: 73.92,
     anchorY: 40.75,
+  },
+  {
+    kind: "service",
+    service: MODEL_GATEWAY_SERVICE,
+    label: MODEL_GATEWAY_SERVICE.name,
+    thumbnail: "/profile-desktop/apps/model-gateway.png",
+    thumbnailAspectRatio: 2048 / 1371,
+    anchorX: 55,
+    anchorY: 29.5,
   },
   {
     kind: "note",
